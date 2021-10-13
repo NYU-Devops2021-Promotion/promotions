@@ -18,11 +18,11 @@ class DataValidationError(Exception):
     pass
 
 
-class YourResourceModel(db.Model):
+class PromotionModel(db.Model):
     """
     Class that represents a <your resource model name>
     """
-
+    
     app = None
 
     # Table Schema

@@ -154,17 +154,17 @@ class PromotionModel(db.Model):
         """Returns all Promotions with the given name
 
         Args:
-            name (string): the name of the Promotions you want to match
+            product_name (string): the product name of the Promotions you want to match
         """
         logger.info("Processing product query for name=%s ...", product_name)
         return cls.query.filter(cls.product_name == product_name)
 
     @classmethod
     def find_by_category(cls, category:TypeOfPromo=TypeOfPromo.Unknown) -> list:
-        """Returns all of the Pets in a category
+        """Returns all of the Promotions in a category
 
-        :param category: the category of the Pets you want to match
-        :type category: str
+        :param category: the category of the Promotions you want to match
+        :type category: TypeOfPromo
 
         :return: a collection of Pets in that category
         :rtype: list
@@ -178,7 +178,7 @@ class PromotionModel(db.Model):
         """Returns all Promotions with the product id
 
         Args:
-            product_id (int): the product of the Promotions you want to match
+            product_id (int): the product id of the Promotions you want to match
         """ 
         logger.info("Processing product query for id=%s ...", product_id)
         return cls.query.filter(cls.product_id == product_id)
@@ -205,10 +205,10 @@ class PromotionModel(db.Model):
 
     @classmethod
     def find_by_availability(cls, available:bool=True) -> list:
-        """Returns all Pets by their availability
+        """Returns all Promotions by their availability
 
-        :param available: True for pets that are available
-        :type available: str
+        :param available: True for promotions that are available
+        :type available: boolean
 
         :return: a collection of Pets that are available
         :rtype: list
@@ -227,6 +227,7 @@ class PromotionModel(db.Model):
 
     @classmethod
     def find_best_promotion_for_product(cls, product_id:int):
+        """Returns the best available Promotion for a product"""
         promotions = cls.query.filter(
             cls.product_id == product_id
             ).filter(

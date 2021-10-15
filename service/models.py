@@ -164,9 +164,8 @@ class PromotionModel(db.Model):
         """Returns all of the Promotions in a category
 
         :param category: the category of the Promotions you want to match
-        :type category: TypeOfPromo
 
-        :return: a collection of Pets in that category
+        :return: a collection of Promotionss in that category
         :rtype: list
 
         """
@@ -210,7 +209,8 @@ class PromotionModel(db.Model):
         :param available: True for promotions that are available
         :type available: boolean
 
-        :return: a collection of Pets that are available
+
+        :return: a collection of Promotions that are available
         :rtype: list
 
         """
@@ -227,7 +227,8 @@ class PromotionModel(db.Model):
 
     @classmethod
     def find_best_promotion_for_product(cls, product_id:int):
-        """Returns the best available Promotion for a product"""
+        """Returns the best available Promotion for a product""" 
+
         promotions = cls.query.filter(
             cls.product_id == product_id
             ).filter(

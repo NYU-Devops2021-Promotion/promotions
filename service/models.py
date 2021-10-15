@@ -14,6 +14,9 @@ logger = logging.getLogger("flask.app")
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
 
+def init_db(app):
+    """Initialies the SQLAlchemy app"""
+    PromotionModel.init_db(app)
 
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
@@ -203,8 +206,9 @@ class PromotionModel(db.Model):
     def find_by_availability(cls, available:bool=True) -> list:
         """Returns all Promotions by their availability
 
-        :param available: True for Promotions that are available
-        :type available: str
+        :param available: True for promotions that are available
+        :type available: boolean
+
 
         :return: a collection of Promotions that are available
         :rtype: list
@@ -224,6 +228,7 @@ class PromotionModel(db.Model):
     @classmethod
     def find_best_promotion_for_product(cls, product_id:int):
         """Returns the best available Promotion for a product""" 
+
         promotions = cls.query.filter(
             cls.product_id == product_id
             ).filter(

@@ -158,10 +158,9 @@ class PromotionModel(db.Model):
 
     @classmethod
     def find_by_category(cls, category:TypeOfPromo=TypeOfPromo.Unknown) -> list:
-        """Returns all of the Promotionss in a category
+        """Returns all of the Promotions in a category
 
-        :param category: the category of the Promotinos you want to match
-        :type category: TypeOfPromo
+        :param category: the category of the Promotions you want to match
 
         :return: a collection of Promotionss in that category
         :rtype: list
@@ -202,7 +201,7 @@ class PromotionModel(db.Model):
 
     @classmethod
     def find_by_availability(cls, available:bool=True) -> list:
-        """Returns all Promotionss by their availability
+        """Returns all Promotions by their availability
 
         :param available: True for Promotions that are available
         :type available: str
@@ -224,11 +223,7 @@ class PromotionModel(db.Model):
 
     @classmethod
     def find_best_promotion_for_product(cls, product_id:int):
-        """Returns the best available Promotion for a product
-
-        Args:
-            product_id: the product id of Promotions you want to match
-        """ 
+        """Returns the best available Promotion for a product""" 
         promotions = cls.query.filter(
             cls.product_id == product_id
             ).filter(

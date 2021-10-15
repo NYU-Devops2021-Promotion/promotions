@@ -434,6 +434,7 @@ class TestPromotion(unittest.TestCase):
         self.assertEqual(len(promotion_list), 2)
 
     def test_find_best_promotion(self):
+        """find the best available promotion for a product"""
         current_date = datetime.now()
         best_promotion = PromotionModel.find_best_promotion_for_product(11111)
         self.assertEqual(best_promotion, None)

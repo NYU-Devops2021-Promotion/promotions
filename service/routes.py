@@ -36,6 +36,44 @@ def index():
         "Reminder: return some useful information in json format about the service here",
         status.HTTP_200_OK,
     )
+######################################################################
+# RETRIEVE A PROMOTION
+######################################################################
+@app.route("/promotions/<int:promotion_id>", methods=["GET"])
+def get_promotions(promotion_id):
+    """
+    Retrieve a single promotion
+
+    This endpoint will return a promotion based on it's id
+    """
+    app.logger.info("Request for promotion with id: %s", promotion_id)
+    promotion = PromotionModel.find(promotion_id)
+    if not promotion:
+        raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
+
+    app.logger.info("Returning promotion: %s", promotion.product_name)
+    return make_response(jsonify(promotion.serialize()), status.HTTP_200_OK)
+
+######################################################################
+# ADD A NEW PROMOTION
+######################################################################
+@app.route("/promotions", methods=["POST"])
+def create_promotions():
+    """
+    Creates a Promotion
+    This endpoint will create a Promotion based the data in the body that is posted
+    """
+    app.logger.info("Request to create a promotion")
+    promotion = PromotionModel()
+    promotion.deserialize(request.get_json())
+    promotion.create()
+    message = promotion.serialize()
+    location_url = url_for("get_promotions", promotion_id=promotion.id, _external=True)
+
+    app.logger.info("Promotion with ID [%s] created.", promotion.id)
+    return make_response(
+        jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+    )
 
 
 ######################################################################

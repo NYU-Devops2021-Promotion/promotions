@@ -44,6 +44,7 @@ def get_promotions(promotion_id):
     """
     Retrieve a single promotion
 
+<<<<<<< Updated upstream
     This endpoint will return a promotion based on it's id
     """
     app.logger.info("Request for promotion with id: %s", promotion_id)
@@ -52,6 +53,28 @@ def get_promotions(promotion_id):
         raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
 
     app.logger.info("Returning promotion: %s", promotion.product_name)
+=======
+######################################################################
+# UPDATE A PROMOTION 
+######################################################################
+@app.route("/promotions/<int:promotion_id>", methods=["PUT"])
+def update_promotion(promotion_id):
+    """
+    Update a promotion
+
+    This endpoint will update a Promotion based the body that is posted
+    """
+    app.logger.info("Request to update promotion with id: %s", promotion_id)
+    check_content_type("application/json")
+    promotion = Promotion.find(promotion_id)
+    if not promotion:
+        raise NotFound("Pet with id '{}' was not found.".format(promotion_id))
+    promotion.deserialize(request.get_json())
+    promotion.id = promotion_id
+    promotion.update()
+
+    app.logger.info("Promotion with ID [%s] updated.", promotion.id)
+>>>>>>> Stashed changes
     return make_response(jsonify(promotion.serialize()), status.HTTP_200_OK)
 
 ######################################################################

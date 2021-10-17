@@ -77,9 +77,24 @@ def create_promotions():
 
 
 ######################################################################
+# DELETE A PROMOTION
+######################################################################
+@app.route("/promotions/<int:promotion_id>", methods=["DELETE"])
+def delete_promotions(promotion_id):
+    """
+    Delete a promotion
+    This endpoint will delete a promotion based the id specified in the path
+    """
+    app.logger.info("Request to delete promotion with id: %s", promotion_id)
+    promotion = PromotionModel.find(promotion_id)
+    if promotion:
+        promotion.delete()
+    app.logger.info("Promotion with ID [%s] delete complete.", promotion_id)
+    return make_response("", status.HTTP_204_NO_CONTENT)
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
-
 
 def init_db():
     """ Initialies the SQLAlchemy app """

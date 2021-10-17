@@ -79,7 +79,7 @@ class TestYourResourceServer(TestCase):
 
     def test_get_promotion(self):
         """Get a single Promotion"""
-        # get the id of a pet
+        # get the id of a promotio
         test_promotion = self._create_promotions(1)[0]
         resp = self.app.get(
             "/promotions/{}".format(test_promotion.id), content_type=CONTENT_TYPE_JSON
@@ -124,3 +124,19 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(new_promotion["product_id"], test_promotion.product_id, "Product id does not match")
         self.assertEqual(new_promotion["product_name"], test_promotion.product_name, "Name does not match")
         self.assertEqual(new_promotion["to_date"], test_promotion.to_date.isoformat(), "To date does not match")
+
+
+
+    def test_delete_promotion(self):
+        """Delete a Promotion"""
+        test_promotion = self._create_promotions(1)[0]
+        resp = self.app.delete(
+            "{0}/{1}".format(BASE_URL, test_promotion.product_id), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
+        # make sure they are deleted
+        resp = self.app.get(
+            "{0}/{1}".format(BASE_URL, test_promotion.product_id), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)

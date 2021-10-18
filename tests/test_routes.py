@@ -77,6 +77,7 @@ class TestYourResourceServer(TestCase):
         resp = self.app.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
+<<<<<<< Updated upstream
     def test_get_promotion(self):
         """Get a single Promotion"""
         # get the id of a promotio
@@ -144,6 +145,11 @@ class TestYourResourceServer(TestCase):
 def test_update_promotion(self):
         """Update an existing Promotion"""
         # create a promotion to update
+=======
+    def test_update_promotion(self):
+        """Update an existing Promotion"""
+        # create a pet to update
+>>>>>>> Stashed changes
         test_promotion = PromotionFactory()
         resp = self.app.post(
             BASE_URL, json=test_promotion.serialize(), content_type=CONTENT_TYPE_JSON
@@ -161,4 +167,8 @@ def test_update_promotion(self):
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_promotion = resp.get_json()
+<<<<<<< Updated upstream
         self.assertEqual(updated_promotion["category"], "unknown")
+=======
+        self.assertEqual(updated_promotion["category"], "unknown")
+>>>>>>> Stashed changes

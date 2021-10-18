@@ -148,7 +148,7 @@ def test_update_promotion(self):
 =======
     def test_update_promotion(self):
         """Update an existing Promotion"""
-        # create a pet to update
+        # create a promotion to update
 >>>>>>> Stashed changes
         test_promotion = PromotionFactory()
         resp = self.app.post(
@@ -161,7 +161,7 @@ def test_update_promotion(self):
         logging.debug(new_promotion)
         new_promotion["category"] = "unknown"
         resp = self.app.put(
-            "/pets/{}".format(new_promotion["id"]),
+            "/promotion/{}".format(new_promotion["id"]),
             json=new_promotion,
             content_type=CONTENT_TYPE_JSON,
         )

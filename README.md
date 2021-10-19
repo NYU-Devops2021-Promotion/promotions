@@ -8,9 +8,10 @@ NYU Devops2021 Promotions
     vagrant up
     vagrant ssh
 ```
-### Disconnect the vagrant
+### Exit and shut down the vm
 ```shell
     exit
+    $ vagrant halt
 ```
 ### Testing
 You need enter the vagrant by ```vagrant ssh``` to do the next:
@@ -18,3 +19,9 @@ You need enter the vagrant by ```vagrant ssh``` to do the next:
     cd /vagrant
     nosetests
 ```
+### What's featured in the project?
+
+    * app/routes.py -- the main Service routes using Python Flask
+    * app/models.py -- the data model using SQLAlchemy
+    * tests/test_service.py -- test cases against the Pet service
+    * tests/test_pets.py -- test cases against the Pet model

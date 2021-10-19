@@ -166,6 +166,10 @@ class PromotionModel(db.Model):
         :rtype: list
 
         """
+        # if the category is input as string format such as "TypeOfPromo.Unknown", convert it to enum
+        if isinstance(category, str):
+            logger.info("Category is %s: ", category)
+            category = TypeOfPromo[category.split('.')[-1]]
         logger.info("Processing category query for %s ...", category.name)
         return cls.query.filter(cls.category == category)
 

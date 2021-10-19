@@ -13,6 +13,7 @@ from unittest.mock import MagicMock, patch
 from service import status  # HTTP Status Codes
 from service.models import db
 from service.routes import app, init_db
+from urllib.parse import quote_plus
 from .factories import PromotionFactory
 
 DATABASE_URI = os.getenv(
@@ -92,7 +93,43 @@ class TestYourResourceServer(TestCase):
         """Get a Promotion thats not found"""
         resp = self.app.get("/promotions/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-    
+
+    def test_get_promotion_list(self):
+        """Get a list of promotions"""
+        self._create_promotions(5)
+        resp = self.app.get(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 5)
+            
+    def test_method_not_allowed(self):
+        """Get a http request thats not allowed"""
+        resp = self.app.post("/")
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_create_promotion_no_content_type(self):
+         """Create a promotion with no content type"""
+         resp = self.app.post(BASE_URL)
+         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_query_promotion_list_by_category(self):
+        """Query promotions by Category"""
+        promotions = self._create_promotions(10)
+        test_category = promotions[0].category
+
+        category_promotions = [promotion for promotion in promotions if promotion.category == test_category]
+        logging.debug(promotions[0])
+        resp = self.app.get(
+            BASE_URL, query_string="category={}".format((test_category))
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), len(category_promotions))
+        # check the data just to be sure
+        for promotion in data:
+            self.assertEqual(promotion["category"], test_category.name)
+            
+
     def test_create_promotion(self):
         """Create a new Promotion"""
         test_promotion = PromotionFactory()
@@ -125,7 +162,7 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(new_promotion["product_name"], test_promotion.product_name, "Name does not match")
         self.assertEqual(new_promotion["to_date"], test_promotion.to_date.isoformat(), "To date does not match")
 
-
+    
 
     def test_delete_promotion(self):
         """Delete a Promotion"""

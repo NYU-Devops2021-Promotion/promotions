@@ -36,6 +36,29 @@ def index():
         "Reminder: return some useful information in json format about the service here",
         status.HTTP_200_OK,
     )
+
+    
+######################################################################
+# LIST ALL promotionS
+######################################################################
+@app.route("/promotions", methods=["GET"])
+def list_promotions():
+    """Returns all of the promotions"""
+    app.logger.info("Request for promotion list")
+    promotions = []
+    category = request.args.get("category")
+    name = request.args.get("product_name")
+    if category:
+        promotions = PromotionModel.find_by_category(category)
+    elif name:
+        promotions = PromotionModel.find_by_product_name(name)
+    else:
+        promotions = PromotionModel.all()
+
+    results = [promotion.serialize() for promotion in promotions]
+    app.logger.info("Returning %d promotions", len(results))
+    return make_response(jsonify(results), status.HTTP_200_OK)
+
 ######################################################################
 # RETRIEVE A PROMOTION
 ######################################################################
@@ -74,6 +97,7 @@ def create_promotions():
     return make_response(
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
+
 
 
 ######################################################################

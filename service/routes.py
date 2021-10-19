@@ -49,8 +49,10 @@ def list_promotions():
     category = request.args.get("category")
     name = request.args.get("product_name")
     if category:
+        app.logger.info("Category: %s", category)
         promotions = PromotionModel.find_by_category(category)
     elif name:
+
         promotions = PromotionModel.find_by_product_name(name)
     else:
         promotions = PromotionModel.all()

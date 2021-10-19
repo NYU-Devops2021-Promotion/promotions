@@ -103,7 +103,7 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(len(data), 5)
             
     def test_method_not_allowed(self):
-        """Get a http request thats not found"""
+        """Get a http request thats not allowed"""
         resp = self.app.post("/")
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
@@ -111,6 +111,24 @@ class TestYourResourceServer(TestCase):
          """Create a promotion with no content type"""
          resp = self.app.post(BASE_URL)
          self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_query_promotion_list_by_category(self):
+        """Query promotions by Category"""
+        promotions = self._create_promotions(10)
+        test_category = promotions[0].category
+
+        category_promotions = [promotion for promotion in promotions if promotion.category == test_category]
+        logging.debug(promotions[0])
+        resp = self.app.get(
+            BASE_URL, query_string="category={}".format((test_category))
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), len(category_promotions))
+        # check the data just to be sure
+        for promotion in data:
+            self.assertEqual(promotion["category"], test_category.name)
+            
 
     def test_create_promotion(self):
         """Create a new Promotion"""

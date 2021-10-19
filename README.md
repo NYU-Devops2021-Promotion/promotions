@@ -23,5 +23,5 @@ You need enter the vagrant by ```vagrant ssh``` to do the next:
 
     * app/routes.py -- the main Service routes using Python Flask
     * app/models.py -- the data model using SQLAlchemy
-    * tests/test_service.py -- test cases against the Pet service
-    * tests/test_pets.py -- test cases against the Pet model
+    * tests/test_service.py -- test cases against the Promotion service
+    * tests/test_model.py -- test cases against the Promotion model

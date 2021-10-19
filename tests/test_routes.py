@@ -128,6 +128,23 @@ class TestYourResourceServer(TestCase):
         # check the data just to be sure
         for promotion in data:
             self.assertEqual(promotion["category"], test_category.name)
+    
+    def test_query_promotion_list_by_name(self):
+        """Query promotions by Name"""
+        promotions = self._create_promotions(10)
+        test_name = promotions[0].product_name
+
+        name_promotions = [promotion for promotion in promotions if promotion.product_name == test_name]
+        logging.debug(promotions[0])
+        resp = self.app.get(
+            BASE_URL, query_string="product_name={}".format((test_name))
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), len(name_promotions))
+        # check the data just to be sure
+        for promotion in data:
+            self.assertEqual(promotion["product_name"], test_name)
             
 
     def test_create_promotion(self):

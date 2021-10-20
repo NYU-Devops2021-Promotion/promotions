@@ -6,7 +6,7 @@ import logging
 import unittest
 import os
 from werkzeug.exceptions import NotFound
-from service.models import PromotionModel, TypeOfPromo, DataValidationError, db
+from service.models import Promotion, TypeOfPromo, DataValidationError, db
 from service import app
 from .factories import PromotionFactory
 from datetime import datetime, timedelta
@@ -28,7 +28,7 @@ class TestPromotion(unittest.TestCase):
         app.config["DEBUG"] = False
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
         app.logger.setLevel(logging.CRITICAL)
-        PromotionModel.init_db(app)
+        Promotion.init_db(app)
 
     @classmethod
     def tearDownClass(cls):
@@ -51,7 +51,7 @@ class TestPromotion(unittest.TestCase):
 
     def test_create_a_promotion(self):
         """Create a promotion and assert that it exists"""
-        promotion = PromotionModel(
+        promotion = Promotion(
             product_name="Macbook", 
             category=TypeOfPromo.Discount, 
             product_id=11111, amount=10, 
@@ -68,7 +68,7 @@ class TestPromotion(unittest.TestCase):
         self.assertEqual(promotion.description, "Gread Deal")
         self.assertEqual(promotion.from_date, datetime(2021, 10, 13))
         self.assertEqual(promotion.to_date, datetime(2021, 10, 19))
-        promotion = PromotionModel(
+        promotion = Promotion(
             product_name="Macbook", 
             category=TypeOfPromo.BOGOF, 
             product_id=11111, amount=10, 
@@ -77,7 +77,7 @@ class TestPromotion(unittest.TestCase):
             to_date=datetime(2021, 10, 19)
             )
         self.assertEqual(promotion.category, TypeOfPromo.BOGOF)
-        promotion = PromotionModel(
+        promotion = Promotion(
             product_name="Macbook", 
             category=TypeOfPromo.Unknown, 
             product_id=11111, amount=10, 
@@ -89,9 +89,9 @@ class TestPromotion(unittest.TestCase):
 
     def test_add_a_promotion(self):
         """Create a promotion and add it to the database"""
-        promotions = PromotionModel.all()
+        promotions = Promotion.all()
         self.assertEqual(promotions, [])
-        promotion = PromotionModel(
+        promotion = Promotion(
             product_name="Macbook", 
             category=TypeOfPromo.Discount, 
             product_id=11111, amount=-1, 
@@ -126,7 +126,7 @@ class TestPromotion(unittest.TestCase):
         self.assertEqual(promotion.amount, 15)
         # Fetch it back and make sure the id hasn't changed
         # but the data did change
-        promotions = PromotionModel.all()
+        promotions = Promotion.all()
         self.assertEqual(len(promotions), 1)
         self.assertEqual(promotions[0].id, 1)
         self.assertEqual(promotions[0].amount, 15)
@@ -177,7 +177,7 @@ class TestPromotion(unittest.TestCase):
             "from_date": datetime(2021, 10, 13),
             "to_date": datetime(2021, 10, 19),
         }
-        promotion = PromotionModel()
+        promotion = Promotion()
         promotion.deserialize(data)
         self.assertNotEqual(promotion, None)
         self.assertEqual(promotion.id, None)
@@ -200,13 +200,13 @@ class TestPromotion(unittest.TestCase):
             "description": "Great Deal",
             "from_date": datetime(2021, 10, 13),
         }
-        promotion = PromotionModel()
+        promotion = Promotion()
         self.assertRaises(DataValidationError, promotion.deserialize, data)
 
     def test_deserialize_bad_data(self):
         """Test deserialization of bad data"""
         data = "this is not a dictionary"
-        promotion = PromotionModel()
+        promotion = Promotion()
         self.assertRaises(DataValidationError, promotion.deserialize, data)
 
     def test_deserialize_bad_attribute(self):
@@ -214,7 +214,7 @@ class TestPromotion(unittest.TestCase):
         test_promotion = PromotionFactory()
         data = test_promotion.serialize()
         data["category"] = "discount" # wrong case
-        promotion = PromotionModel()
+        promotion = Promotion()
         self.assertRaises(DataValidationError, promotion.deserialize, data)
 
     def test_find_promotion(self):
@@ -226,7 +226,7 @@ class TestPromotion(unittest.TestCase):
         # make sure they got saved
         self.assertEqual(len(promotion.all()), 3)
         # find the 2nd promotion in the list
-        promotion = PromotionModel.find(promotions[1].id)
+        promotion = Promotion.find(promotions[1].id)
         self.assertIsNot(promotion, None)
         self.assertEqual(promotion.id, promotions[1].id)
         self.assertEqual(promotion.product_name, promotions[1].product_name)
@@ -256,11 +256,11 @@ class TestPromotion(unittest.TestCase):
 
     def test_find_or_404_not_found(self):
         """Find or return 404 NOT found"""
-        self.assertRaises(NotFound, PromotionModel.find_or_404, 0)
+        self.assertRaises(NotFound, Promotion.find_or_404, 0)
 
     def test_find_by_product_name(self):
         """Find a promotion by Product Name"""
-        PromotionModel(
+        Promotion(
             product_name="Macbook", 
             category=TypeOfPromo.Discount, 
             product_id=11111, amount=10, 
@@ -268,7 +268,7 @@ class TestPromotion(unittest.TestCase):
             from_date=datetime(2021, 10, 13), 
             to_date=datetime(2021, 10, 19)
             ).create()
-        PromotionModel(
+        Promotion(
             product_name="iwatch", 
             category=TypeOfPromo.Discount, 
             product_id=11112, amount=20, 
@@ -276,7 +276,7 @@ class TestPromotion(unittest.TestCase):
             from_date=datetime(2021, 10, 14), 
             to_date=datetime(2021, 10, 20)
             ).create()
-        promotions = PromotionModel.find_by_product_name("Macbook")
+        promotions = Promotion.find_by_product_name("Macbook")
         self.assertEqual(promotions[0].category, TypeOfPromo.Discount)
         self.assertEqual(promotions[0].product_name, "Macbook")
         self.assertEqual(promotions[0].product_id, 11111)
@@ -287,14 +287,14 @@ class TestPromotion(unittest.TestCase):
 
     def test_find_by_category(self):
         """Find promotions by Category"""
-        PromotionModel(
+        Promotion(
             product_name="Macbook", 
             category=TypeOfPromo.Discount, 
             product_id=11111, amount=10, description="Gread Deal", 
             from_date=datetime(2021, 10, 13), 
             to_date=datetime(2021, 10, 19)
             ).create()
-        PromotionModel(
+        Promotion(
             product_name="iwatch", 
             category=TypeOfPromo.BOGOF, 
             product_id=11112, amount=20, 
@@ -302,7 +302,7 @@ class TestPromotion(unittest.TestCase):
             from_date=datetime(2021, 10, 14), 
             to_date=datetime(2021, 10, 20)
             ).create()
-        promotions = PromotionModel.find_by_category(TypeOfPromo.BOGOF)
+        promotions = Promotion.find_by_category(TypeOfPromo.BOGOF)
         self.assertEqual(promotions[0].category, TypeOfPromo.BOGOF)
         self.assertEqual(promotions[0].product_name, "iwatch")
         self.assertEqual(promotions[0].product_id, 11112)
@@ -313,7 +313,7 @@ class TestPromotion(unittest.TestCase):
 
     def test_find_by_product_id(self):
         """Find promotions by product id"""
-        PromotionModel(
+        Promotion(
             product_name="Macbook", 
             category=TypeOfPromo.Discount, 
             product_id=11111, amount=10, 
@@ -321,7 +321,7 @@ class TestPromotion(unittest.TestCase):
             from_date=datetime(2021, 10, 13), 
             to_date=datetime(2021, 10, 19)
             ).create()
-        PromotionModel(
+        Promotion(
             product_name="iwatch", 
             category=TypeOfPromo.BOGOF, 
             product_id=11112, amount=20, 
@@ -329,7 +329,7 @@ class TestPromotion(unittest.TestCase):
             from_date=datetime(2021, 10, 14), 
             to_date=datetime(2021, 10, 20)
             ).create()
-        promotions = PromotionModel.find_by_product_id(11112)
+        promotions = Promotion.find_by_product_id(11112)
         self.assertEqual(promotions[0].category, TypeOfPromo.BOGOF)
         self.assertEqual(promotions[0].product_name, "iwatch")
         self.assertEqual(promotions[0].product_id, 11112)
@@ -340,7 +340,7 @@ class TestPromotion(unittest.TestCase):
 
     def test_find_by_from_date(self):
         """Find promotions by start date"""
-        PromotionModel(
+        Promotion(
             product_name="Macbook", 
             category=TypeOfPromo.Discount, 
             product_id=11111, amount=10, 
@@ -348,7 +348,7 @@ class TestPromotion(unittest.TestCase):
             from_date=datetime(2021, 10, 13), 
             to_date=datetime(2021, 10, 19)
             ).create()
-        PromotionModel(
+        Promotion(
             product_name="iwatch", 
             category=TypeOfPromo.BOGOF, 
             product_id=11112, amount=20, 
@@ -356,7 +356,7 @@ class TestPromotion(unittest.TestCase):
             from_date=datetime(2021, 10, 14), 
             to_date=datetime(2021, 10, 20)
             ).create()
-        promotions = PromotionModel.find_by_from_date("2021/10/14")
+        promotions = Promotion.find_by_from_date("2021/10/14")
         self.assertEqual(promotions[0].category, TypeOfPromo.BOGOF)
         self.assertEqual(promotions[0].product_name, "iwatch")
         self.assertEqual(promotions[0].product_id, 11112)
@@ -367,7 +367,7 @@ class TestPromotion(unittest.TestCase):
 
     def test_find_by_to_date(self):
         """Find promotions by end date"""
-        PromotionModel(
+        Promotion(
             product_name="Macbook", 
             category=TypeOfPromo.Discount, 
             product_id=11111, amount=10, 
@@ -375,7 +375,7 @@ class TestPromotion(unittest.TestCase):
             from_date=datetime(2021, 10, 13), 
             to_date=datetime(2021, 10, 19)
             ).create()
-        PromotionModel(
+        Promotion(
             product_name="iwatch", 
             category=TypeOfPromo.BOGOF, 
             product_id=11112, amount=20, 
@@ -383,7 +383,7 @@ class TestPromotion(unittest.TestCase):
             from_date=datetime(2021, 10, 14), 
             to_date=datetime(2021, 10, 20)
             ).create()
-        promotions = PromotionModel.find_by_to_date("2021/10/20")
+        promotions = Promotion.find_by_to_date("2021/10/20")
         self.assertEqual(promotions[0].category, TypeOfPromo.BOGOF)
         self.assertEqual(promotions[0].product_name, "iwatch")
         self.assertEqual(promotions[0].product_id, 11112)
@@ -395,7 +395,7 @@ class TestPromotion(unittest.TestCase):
     def test_find_by_availability(self):
         """Find promotions by Availability"""
         current_date = datetime.now()
-        PromotionModel(
+        Promotion(
             product_name="Macbook", 
             category=TypeOfPromo.Discount, 
             product_id=11111, amount=10, 
@@ -403,7 +403,7 @@ class TestPromotion(unittest.TestCase):
             from_date=current_date - timedelta(days=1), 
             to_date=current_date + timedelta(days=5)
             ).create()
-        PromotionModel(
+        Promotion(
             product_name="iwatch", 
             category=TypeOfPromo.BOGOF, 
             product_id=11112, amount=20, 
@@ -411,7 +411,7 @@ class TestPromotion(unittest.TestCase):
             from_date=datetime(2021, 10, 7), 
             to_date=datetime(2021, 10, 13)
             ).create()
-        PromotionModel(
+        Promotion(
             product_name="iphone", 
             category=TypeOfPromo.BOGOF, 
             product_id=11113, amount=30, 
@@ -419,7 +419,7 @@ class TestPromotion(unittest.TestCase):
             from_date=current_date + timedelta(days=1), 
             to_date=current_date + timedelta(days=7)
             ).create() 
-        promotions = PromotionModel.find_by_availability(True)
+        promotions = Promotion.find_by_availability(True)
         promotion_list = [promotion for promotion in promotions]
         self.assertEqual(len(promotion_list), 1)
         self.assertEqual(promotions[0].category, TypeOfPromo.Discount)
@@ -429,16 +429,16 @@ class TestPromotion(unittest.TestCase):
         self.assertEqual(promotions[0].description, "Gread Deal")
         self.assertEqual(promotions[0].from_date, current_date - timedelta(days=1)) 
         self.assertEqual(promotions[0].to_date, current_date + timedelta(days=5)) 
-        promotions = PromotionModel.find_by_availability(False)
+        promotions = Promotion.find_by_availability(False)
         promotion_list = [promotion for promotion in promotions]
         self.assertEqual(len(promotion_list), 2)
 
     def test_find_best_promotion(self):
         """find the best available promotion for a product"""
         current_date = datetime.now()
-        best_promotion = PromotionModel.find_best_promotion_for_product(11111)
+        best_promotion = Promotion.find_best_promotion_for_product(11111)
         self.assertEqual(best_promotion, None)
-        PromotionModel(
+        Promotion(
             product_name="Macbook", 
             category=TypeOfPromo.Discount, 
             product_id=11111, amount=10, 
@@ -446,7 +446,7 @@ class TestPromotion(unittest.TestCase):
             from_date=current_date - timedelta(days=1), 
             to_date=current_date + timedelta(days=5)
         ).create()
-        PromotionModel(
+        Promotion(
             product_name="Macbook", 
             category=TypeOfPromo.Discount, 
             product_id=11111, amount=20, 
@@ -454,7 +454,7 @@ class TestPromotion(unittest.TestCase):
             from_date=current_date - timedelta(days=1), 
             to_date=current_date + timedelta(days=5)
         ).create()
-        PromotionModel(
+        Promotion(
             product_name="Macbook", 
             category=TypeOfPromo.Discount, 
             product_id=11111, amount=30, 
@@ -462,7 +462,7 @@ class TestPromotion(unittest.TestCase):
             from_date=datetime(2021, 10, 7), 
             to_date=datetime(2021, 10, 13)
         ).create() # invalid promotion
-        PromotionModel(
+        Promotion(
             product_name="Macbook", 
             category=TypeOfPromo.BOGOF, 
             product_id=11111, amount=6, 
@@ -470,7 +470,7 @@ class TestPromotion(unittest.TestCase):
             from_date=current_date - timedelta(days=1), 
             to_date=current_date + timedelta(days=5)
         ).create()
-        best_promotion = PromotionModel.find_best_promotion_for_product(11111)
+        best_promotion = Promotion.find_best_promotion_for_product(11111)
         self.assertEqual(best_promotion.category, TypeOfPromo.Discount)
         self.assertEqual(best_promotion.product_name, "Macbook")
         self.assertEqual(best_promotion.product_id, 11111)

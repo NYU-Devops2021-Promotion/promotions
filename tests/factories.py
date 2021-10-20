@@ -4,14 +4,14 @@ Test Factory to make fake objects for testing
 from datetime import datetime, timedelta
 import factory
 from factory.fuzzy import FuzzyChoice
-from service.models import PromotionModel, TypeOfPromo
+from service.models import Promotion, TypeOfPromo
 
 
 class PromotionFactory(factory.Factory):
     """Creates fake promotions that you don't have to feed"""
 
     class Meta:
-        model = PromotionModel
+        model = Promotion
 
     id = factory.Sequence(lambda n: n)
     product_name = factory.LazyAttribute(lambda o: 'iphone%s' % o.id)

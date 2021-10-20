@@ -43,7 +43,7 @@ for handler in app.logger.handlers:
 app.logger.info("Logging handler established")
 
 app.logger.info(70 * "*")
-app.logger.info("  P E T   S E R V I C E   R U N N I N G  ".center(70, "*"))
+app.logger.info("PROMOTION SERVICE RUNNING  ".center(70, "*"))
 app.logger.info(70 * "*")
 
 try:

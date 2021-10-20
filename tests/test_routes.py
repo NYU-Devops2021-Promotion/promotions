@@ -190,7 +190,7 @@ class TestYourResourceServer(TestCase):
         # update the promotion
         new_promotion = resp.get_json()
         logging.debug(new_promotion)
-        new_promotion["category"] = "unknown"
+        new_promotion["category"] = "Unknown"
         resp = self.app.put(
             "/promotions/{}".format(new_promotion["id"]),
             json=new_promotion,
@@ -198,7 +198,7 @@ class TestYourResourceServer(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_promotion = resp.get_json()
-        self.assertEqual(updated_promotion["category"], "unknown")
+        self.assertEqual(updated_promotion["category"], "Unknown")
 
     def test_delete_promotion(self):
         """Delete a Promotion"""

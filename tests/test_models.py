@@ -120,6 +120,7 @@ class TestPromotion(unittest.TestCase):
         self.assertEqual(promotion.id, 1)
         # Change it an save it
         promotion.amount = 15
+        promotion.category = "Unknown" 
         original_id = promotion.id
         promotion.save()
         self.assertEqual(promotion.id, original_id)

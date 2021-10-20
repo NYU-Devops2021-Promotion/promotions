@@ -14,6 +14,7 @@ import os
 import sys
 import logging
 from flask import Flask, jsonify, request, url_for, make_response, abort
+
 from . import status  # HTTP Status Codes
 from werkzeug.exceptions import NotFound
 
@@ -36,6 +37,7 @@ def index():
         "Reminder: return some useful information in json format about the service here",
         status.HTTP_200_OK,
     )
+
 ######################################################################
 # RETRIEVE A PROMOTION
 ######################################################################
@@ -43,8 +45,6 @@ def index():
 def get_promotions(promotion_id):
     """
     Retrieve a single promotion
-
-<<<<<<< Updated upstream
     This endpoint will return a promotion based on it's id
     """
     app.logger.info("Request for promotion with id: %s", promotion_id)
@@ -53,28 +53,6 @@ def get_promotions(promotion_id):
         raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
 
     app.logger.info("Returning promotion: %s", promotion.product_name)
-=======
-######################################################################
-# UPDATE A PROMOTION 
-######################################################################
-@app.route("/promotions/<int:promotion_id>", methods=["PUT"])
-def update_promotion(promotion_id):
-    """
-    Update a promotion
-
-    This endpoint will update a Promotion based the body that is posted
-    """
-    app.logger.info("Request to update promotion with id: %s", promotion_id)
-    check_content_type("application/json")
-    promotion = Promotion.find(promotion_id)
-    if not promotion:
-        raise NotFound("Pet with id '{}' was not found.".format(promotion_id))
-    promotion.deserialize(request.get_json())
-    promotion.id = promotion_id
-    promotion.update()
-
-    app.logger.info("Promotion with ID [%s] updated.", promotion.id)
->>>>>>> Stashed changes
     return make_response(jsonify(promotion.serialize()), status.HTTP_200_OK)
 
 ######################################################################
@@ -116,6 +94,27 @@ def delete_promotions(promotion_id):
     return make_response("", status.HTTP_204_NO_CONTENT)
 
 ######################################################################
+# UPDATE AN EXISTING PROMOTION
+######################################################################
+@app.route("/promotions/<int:promotion_id>", methods=["PUT"])
+def update_promotions(promotion_id):
+    """
+    Update a Promotion
+    This endpoint will update a Promotion based the body that is posted
+    """
+    app.logger.info("Request to update promotion with id: %s", promotion_id)
+    check_content_type("application/json")
+    promotion = PromotionModel.find(promotion_id)
+    if not promotion:
+        raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
+    promotion.deserialize(request.get_json())
+    promotion.id = promotion_id
+    promotion.save()
+
+    app.logger.info("Promotion with ID [%s] updated.", promotion.id)
+    return make_response(jsonify(promotion.serialize()), status.HTTP_200_OK)
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 
@@ -124,23 +123,14 @@ def init_db():
     global app
     PromotionModel.init_db(app)
 
-######################################################################
-# UPDATE AN EXISTING PROMOTIONS
-######################################################################
-@app.route("/promotions/<int:promotion_id>", methods=["PUT"])
-def update_promotions(promotion_id):
-    """
-    Update a Promotion
-    This endpoint will update a Promotion based the body that is posted
-    """
-    app.logger.info("Request to update pet with id: %s", promotion_id)
-    check_content_type("application/json")
-    promotion = Promotion.find(promotion_id)
-    if not promotion:
-        raise NotFound("Pet with id '{}' was not found.".format(promotion_id))
-    promotion.deserialize(request.get_json())
-    promotion.id = promotion_id
-    promotion.update()
 
-    app.logger.info("Promotion with ID [%s] updated.", promotion.id)
-    return make_response(jsonify(promotion.serialize()), status.HTTP_200_OK)
+def check_content_type(media_type):
+    """Checks that the media type is correct"""
+    content_type = request.headers.get("Content-Type")
+    if content_type and content_type == media_type:
+        return
+    app.logger.error("Invalid Content-Type: %s", content_type)
+    abort(
+        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+        "Content-Type must be {}".format(media_type),
+    )

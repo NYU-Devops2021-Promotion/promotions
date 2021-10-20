@@ -12,7 +12,7 @@ from .factories import PromotionFactory
 from datetime import datetime, timedelta
 
 DATABASE_URI = os.getenv(
-    "DATABASE_URI", "postgres://postgres:postgres@localhost:5432/testdb"
+    "DATABASE_URI", "postgres://postgres:postgres@localhost:5432/postgres"
 )
 
 ######################################################################

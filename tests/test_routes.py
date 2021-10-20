@@ -17,7 +17,7 @@ from urllib.parse import quote_plus
 from .factories import PromotionFactory
 
 DATABASE_URI = os.getenv(
-    "DATABASE_URI", "postgres://postgres:postgres@localhost:5432/testdb"
+    "DATABASE_URI", "postgres://postgres:postgres@localhost:5432/postgres"
 )
 BASE_URL = "/promotions"
 CONTENT_TYPE_JSON = "application/json"
@@ -128,7 +128,7 @@ class TestYourResourceServer(TestCase):
         # check the data just to be sure
         for promotion in data:
             self.assertEqual(promotion["category"], test_category.name)
-    
+            
     def test_query_promotion_list_by_name(self):
         """Query promotions by Name"""
         promotions = self._create_promotions(10)
@@ -146,7 +146,6 @@ class TestYourResourceServer(TestCase):
         for promotion in data:
             self.assertEqual(promotion["product_name"], test_name)
             
-
     def test_create_promotion(self):
         """Create a new Promotion"""
         test_promotion = PromotionFactory()

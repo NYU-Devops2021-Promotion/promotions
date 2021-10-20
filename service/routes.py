@@ -42,7 +42,7 @@ def index():
     )
     
 ######################################################################
-# LIST ALL promotionS
+# LIST ALL PROMOTIONS
 ######################################################################
 @app.route("/promotions", methods=["GET"])
 def list_promotions():
@@ -103,6 +103,24 @@ def create_promotions():
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
 
+######################################################################
+# UPDATE AN EXISTING PROMOTION
+######################################################################
+@app.route("/promotions/<int:promotion_id>", methods=["PUT"])
+def update_promotions(promotion_id):
+    """
+    Update a Promotion
+
+    This endpoint will update a Promotion based the body that is posted
+    """
+    app.logger.info("Request to update promotion with id: %s", promotion_id)
+    promotion = Promotion.find(promotion_id)
+    promotion.deserialize(request.get_json())
+    promotion.id = promotion_id
+    promotion.update()
+
+    app.logger.info("Promotion with ID [%s] updated.", promotion.id)
+    return make_response(jsonify(promotion.serialize()), status.HTTP_200_OK)
 
 
 ######################################################################

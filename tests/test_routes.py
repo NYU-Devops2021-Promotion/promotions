@@ -178,7 +178,27 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(new_promotion["product_name"], test_promotion.product_name, "Name does not match")
         self.assertEqual(new_promotion["to_date"], test_promotion.to_date.isoformat(), "To date does not match")
 
-    
+    def test_update_promotion(self):
+        """Update an existing Promotion"""
+        # create a promotion to update
+        test_promotion = PromotionFactory()
+        resp = self.app.post(
+            BASE_URL, json=test_promotion.serialize(), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # update the promotion
+        new_promotion = resp.get_json()
+        logging.debug(new_promotion)
+        new_promotion["category"] = "Unknown"
+        resp = self.app.put(
+            "/promotions/{}".format(new_promotion["id"]),
+            json=new_promotion,
+            content_type=CONTENT_TYPE_JSON,
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        updated_promotion = resp.get_json()
+        self.assertEqual(updated_promotion["category"], "Unknown")
 
     def test_delete_promotion(self):
         """Delete a Promotion"""

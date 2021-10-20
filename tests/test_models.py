@@ -121,7 +121,7 @@ class TestPromotion(unittest.TestCase):
         # Change it an save it
         promotion.amount = 15
         original_id = promotion.id
-        promotion.save()
+        promotion.update()
         self.assertEqual(promotion.id, original_id)
         self.assertEqual(promotion.amount, 15)
         # Fetch it back and make sure the id hasn't changed

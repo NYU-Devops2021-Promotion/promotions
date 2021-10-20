@@ -65,7 +65,7 @@ class Promotion(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    def save(self):
+    def update(self):
         """
         Updates a Promotion to the database
         """

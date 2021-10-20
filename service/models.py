@@ -70,8 +70,6 @@ class Promotion(db.Model):
         Updates a Promotion to the database
         """
         logger.info("Saving Promotion for %s", self.product_name)
-        if not self.id:
-            raise DataValidationError("Update called with empty ID field")
         db.session.commit()
 
     def delete(self):

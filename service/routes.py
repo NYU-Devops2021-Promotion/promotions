@@ -115,8 +115,6 @@ def update_promotions(promotion_id):
     """
     app.logger.info("Request to update promotion with id: %s", promotion_id)
     promotion = Promotion.find(promotion_id)
-    if not promotion:
-        raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
     promotion.deserialize(request.get_json())
     promotion.id = promotion_id
     promotion.update()

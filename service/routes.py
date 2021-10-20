@@ -119,7 +119,7 @@ def update_promotions(promotion_id):
         raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
     promotion.deserialize(request.get_json())
     promotion.id = promotion_id
-    promotion.save()
+    promotion.update()
 
     app.logger.info("Promotion with ID [%s] updated.", promotion.id)
     return make_response(jsonify(promotion.serialize()), status.HTTP_200_OK)

@@ -29,7 +29,7 @@ class TypeOfPromo(Enum):
     Unknown = 3
 
 
-class PromotionModel(db.Model):
+class Promotion(db.Model):
     """
     Class that represents a Promotion
     """

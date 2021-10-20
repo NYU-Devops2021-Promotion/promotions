@@ -21,7 +21,7 @@ from werkzeug.exceptions import NotFound
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
 from flask_sqlalchemy import SQLAlchemy
-from service.models import PromotionModel, DataValidationError
+from service.models import Promotion, DataValidationError
 
 # Import Flask application
 from . import app
@@ -53,12 +53,12 @@ def list_promotions():
     name = request.args.get("product_name")
     if category:
         app.logger.info("Category: %s", category)
-        promotions = PromotionModel.find_by_category(category)
+        promotions = Promotion.find_by_category(category)
     elif name:
 
-        promotions = PromotionModel.find_by_product_name(name)
+        promotions = Promotion.find_by_product_name(name)
     else:
-        promotions = PromotionModel.all()
+        promotions = Promotion.all()
 
     results = [promotion.serialize() for promotion in promotions]
     app.logger.info("Returning %d promotions", len(results))
@@ -75,7 +75,7 @@ def get_promotions(promotion_id):
     This endpoint will return a promotion based on it's id
     """
     app.logger.info("Request for promotion with id: %s", promotion_id)
-    promotion = PromotionModel.find(promotion_id)
+    promotion = Promotion.find(promotion_id)
     if not promotion:
         raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
 
@@ -92,7 +92,7 @@ def create_promotions():
     This endpoint will create a Promotion based the data in the body that is posted
     """
     app.logger.info("Request to create a promotion")
-    promotion = PromotionModel()
+    promotion = Promotion()
     promotion.deserialize(request.get_json())
     promotion.create()
     message = promotion.serialize()
@@ -115,7 +115,7 @@ def delete_promotions(promotion_id):
     This endpoint will delete a promotion based the id specified in the path
     """
     app.logger.info("Request to delete promotion with id: %s", promotion_id)
-    promotion = PromotionModel.find(promotion_id)
+    promotion = Promotion.find(promotion_id)
     if promotion:
         promotion.delete()
     app.logger.info("Promotion with ID [%s] delete complete.", promotion_id)
@@ -128,4 +128,4 @@ def delete_promotions(promotion_id):
 def init_db():
     """ Initialies the SQLAlchemy app """
     global app
-    PromotionModel.init_db(app)
+    Promotion.init_db(app)

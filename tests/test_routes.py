@@ -112,6 +112,10 @@ class TestYourResourceServer(TestCase):
          resp = self.app.post(BASE_URL)
          self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
+    ######################################################################
+    # Test quey promotion list
+    ######################################################################
+
     def test_query_promotion_list_by_category(self):
         """Query promotions by Category"""
         promotions = self._create_promotions(10)
@@ -129,8 +133,8 @@ class TestYourResourceServer(TestCase):
         for promotion in data:
             self.assertEqual(promotion["category"], test_category.name)
             
-    def test_query_promotion_list_by_name(self):
-        """Query promotions by Name"""
+    def test_query_promotion_list_by_product_name(self):
+        """Query promotions by Product Name"""
         promotions = self._create_promotions(10)
         test_name = promotions[0].product_name
 
@@ -145,6 +149,60 @@ class TestYourResourceServer(TestCase):
         # check the data just to be sure
         for promotion in data:
             self.assertEqual(promotion["product_name"], test_name)
+
+    def test_query_promotion_list_by_product_id(self):
+        """Query promotions by Product ID"""
+        promotions = self._create_promotions(10)
+        test_product_id= promotions[0].product_id
+
+        product_id_promotions = [promotion for promotion in promotions if promotion.product_id == test_product_id]
+        logging.debug(promotions[0])
+        resp = self.app.get(
+            BASE_URL, query_string="product_id={}".format((test_product_id))
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), len(product_id_promotions))
+        # check the data just to be sure
+        for promotion in data:
+            self.assertEqual(promotion["product_id"], test_product_id)
+    
+    def test_query_promotion_list_by_from_date(self):
+        """Query promotions by From Date"""
+        promotions = self._create_promotions(10)
+        test_from_date= promotions[0].from_date
+
+        from_date_promotions = [promotion for promotion in promotions if promotion.from_date == test_from_date]
+        logging.debug(promotions[0])
+        resp = self.app.get(
+            BASE_URL, query_string="from_date={}".format((test_from_date))
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), len(from_date_promotions))
+        # check the data just to be sure
+        for promotion in data:
+            self.assertEqual(promotion["from_date"], test_from_date.isoformat())
+    
+    def test_query_promotion_list_by_to_date(self):
+        """Query promotions by To Date"""
+        promotions = self._create_promotions(10)
+        test_to_date= promotions[0].to_date
+        to_date_promotions = [promotion for promotion in promotions if promotion.to_date == test_to_date]
+        logging.debug(promotions[0])
+        resp = self.app.get(
+            BASE_URL, query_string="to_date={}".format((test_to_date))
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), len(to_date_promotions))
+        # check the data just to be sure
+        for promotion in data:
+            self.assertEqual(promotion["to_date"], test_to_date.isoformat())
+    
+    ######################################################################
+    # END
+    ######################################################################
             
     def test_create_promotion(self):
         """Create a new Promotion"""

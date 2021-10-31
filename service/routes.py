@@ -51,12 +51,21 @@ def list_promotions():
     promotions = []
     category = request.args.get("category")
     name = request.args.get("product_name")
+    product_id = request.args.get("product_id")
+    from_date = request.args.get("from_date")
+    to_date = request.args.get("to_date")
+
     if category:
         app.logger.info("Category: %s", category)
         promotions = Promotion.find_by_category(category)
     elif name:
-
         promotions = Promotion.find_by_product_name(name)
+    elif product_id:
+        promotions = Promotion.find_by_product_id(product_id)
+    elif from_date:
+        promotions = Promotion.find_by_from_date(from_date)
+    elif to_date:
+        promotions = Promotion.find_by_to_date(to_date)
     else:
         promotions = Promotion.all()
 

@@ -94,6 +94,7 @@ def list_available_promotions_by_product(product_id, availability):
     app.logger.info("Returning {} promotions".format(len(results)))
     return make_response(jsonify(results), status.HTTP_200_OK)
 
+
 ######################################################################
 # RETRIEVE A PROMOTION
 ######################################################################

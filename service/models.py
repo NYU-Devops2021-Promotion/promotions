@@ -254,7 +254,7 @@ class Promotion(db.Model):
         return best_promotion
 
     @classmethod
-    def find_by_multi_attributes(cls, args):
+    def find_by_multi_attributes(cls, args) -> list:
         result = cls.query
         if "category" in args and args["category"] is not None:
             category = args["category"]

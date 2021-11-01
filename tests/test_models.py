@@ -302,7 +302,7 @@ class TestPromotion(unittest.TestCase):
             from_date=datetime(2021, 10, 14), 
             to_date=datetime(2021, 10, 20)
             ).create()
-        promotions = Promotion.find_by_category(TypeOfPromo.BOGOF)
+        promotions = Promotion.find_by_category("TypeOfPromo.BOGOF")
         self.assertEqual(promotions[0].category, TypeOfPromo.BOGOF)
         self.assertEqual(promotions[0].product_name, "iwatch")
         self.assertEqual(promotions[0].product_id, 11112)

@@ -54,46 +54,29 @@ def list_promotions():
     product_id = request.args.get("product_id")
     from_date = request.args.get("from_date")
     to_date = request.args.get("to_date")
+    availabile = request.args.get("available")
 
-    if category:
-        app.logger.info("Category: %s", category)
-        promotions = Promotion.find_by_category(category)
-    elif name:
-        promotions = Promotion.find_by_product_name(name)
-    elif product_id:
-        promotions = Promotion.find_by_product_id(product_id)
-    elif from_date:
-        promotions = Promotion.find_by_from_date(from_date)
-    elif to_date:
-        promotions = Promotion.find_by_to_date(to_date)
+    args = {}
+    if category is not None:
+        args["category"] = category
+    if name is not None:
+        args["product_name"] = name
+    if product_id is not None:
+        args["product_id"] = product_id
+    if from_date is not None:
+        args["from_date"] = from_date
+    if to_date is not None:
+        args["to_date"] = to_date
+    if availabile is not None:
+        args["availability"] = availabile
+    if len(args.keys()) > 0:
+        promotions = Promotion.find_by_multi_attributes(args)
     else:
         promotions = Promotion.all()
 
     results = [promotion.serialize() for promotion in promotions]
     app.logger.info("Returning %d promotions", len(results))
     return make_response(jsonify(results), status.HTTP_200_OK)
-
-######################################################################
-# LIST ALL AVAILABLE PROMOTIONS FOR SPECIFIC PRODUCT
-######################################################################
-@app.route("/promotions/product/<int:product_id>/available/<int:availability>", methods=["GET"])
-def list_available_promotions_by_product(product_id, availability):
-    """A single Multi-attributes query for available promotions with specific product_id
-    
-    Keyword arguments:
-    argument -- product_id, availability
-    Return: promotions list
-    """
-    app.logger.info("Request for available={} promotions with specific product_id={}".format(product_id, availability))
-    args = {
-        "product_id": product_id,
-        "availability": availability
-    }
-    promotions = Promotion.find_by_multi_attributes(args)
-    results = [promotion.serialize() for promotion in promotions]
-    app.logger.info("Returning {} promotions".format(len(results)))
-    return make_response(jsonify(results), status.HTTP_200_OK)
-
 
 ######################################################################
 # RETRIEVE A PROMOTION

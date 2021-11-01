@@ -257,7 +257,10 @@ class Promotion(db.Model):
     def find_by_multi_attributes(cls, args):
         result = cls.query
         if "category" in args and args["category"] is not None:
-            result = result.filter(cls.category == args["category"])
+            category = args["category"]
+            if isinstance(category, str):
+                category = TypeOfPromo[category.split('.')[-1]]
+            result = result.filter(cls.category == category)
         if "product_name" in args and args["product_name"] is not None:
             result = result.filter(cls.product_name == args["product_name"])
         if "product_id" in args and args["product_id"] is not None:
@@ -267,7 +270,7 @@ class Promotion(db.Model):
         if "to_date" in args and args["to_date"] is not None:
             result = result.filter(cls.to_date == args["to_date"])
         if "availability" in args and args["availability"] is not None:
-            if args["availability"] > 0:
+            if int(args["availability"]) > 0:
                 result = result.filter(
                 cls.from_date <= datetime.now()).filter(
                     cls.to_date >= datetime.now()

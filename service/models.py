@@ -118,6 +118,9 @@ class Promotion(db.Model):
             )
         return self
 
+    def is_available(self):
+        return self.from_date <= datetime.now() and self.to_date >= datetime.now()
+
     @classmethod
     def init_db(cls, app):
         """ Initializes the database session """
@@ -218,12 +221,13 @@ class Promotion(db.Model):
         logger.info("Processing available query for %s ...", available)
         if available:
             return cls.query.filter(
-                cls.from_date <= datetime.now()).filter(
+                cls.from_date <= datetime.now()
+                ).filter(
                     cls.to_date >= datetime.now()
                 )
         else:
             return cls.query.filter(
-                (cls.from_date > datetime.now()) | (datetime.now() > cls.to_date)
+                (cls.from_date > datetime.now()) | (cls.to_date < datetime.now())
             )
 
     @classmethod
@@ -248,3 +252,31 @@ class Promotion(db.Model):
                 max_off = off
                 best_promotion = promotion
         return best_promotion
+
+    @classmethod
+    def find_by_multi_attributes(cls, args) -> list:
+        result = cls.query
+        if "category" in args and args["category"] is not None:
+            category = args["category"]
+            if isinstance(category, str):
+                category = TypeOfPromo[category.split('.')[-1]]
+            result = result.filter(cls.category == category)
+        if "product_name" in args and args["product_name"] is not None:
+            result = result.filter(cls.product_name == args["product_name"])
+        if "product_id" in args and args["product_id"] is not None:
+            result = result.filter(cls.product_id == args["product_id"])
+        if "from_date" in args and args["from_date"] is not None:
+            result = result.filter(cls.from_date == args["from_date"])
+        if "to_date" in args and args["to_date"] is not None:
+            result = result.filter(cls.to_date == args["to_date"])
+        if "availability" in args and args["availability"] is not None:
+            if int(args["availability"]) > 0:
+                result = result.filter(
+                cls.from_date <= datetime.now()).filter(
+                    cls.to_date >= datetime.now()
+                )
+            else:
+                result = result.filter(
+                    (cls.from_date > datetime.now()) | (datetime.now() > cls.to_date)
+                )
+        return result

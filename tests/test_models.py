@@ -302,7 +302,7 @@ class TestPromotion(unittest.TestCase):
             from_date=datetime(2021, 10, 14), 
             to_date=datetime(2021, 10, 20)
             ).create()
-        promotions = Promotion.find_by_category(TypeOfPromo.BOGOF)
+        promotions = Promotion.find_by_category("TypeOfPromo.BOGOF")
         self.assertEqual(promotions[0].category, TypeOfPromo.BOGOF)
         self.assertEqual(promotions[0].product_name, "iwatch")
         self.assertEqual(promotions[0].product_id, 11112)
@@ -478,4 +478,36 @@ class TestPromotion(unittest.TestCase):
         self.assertEqual(best_promotion.description, "Gread Deal")
         self.assertEqual(best_promotion.from_date, current_date - timedelta(days=1)) 
         self.assertEqual(best_promotion.to_date, current_date + timedelta(days=5))  
+
+    def test_find_by_multi_attributes(self):
+        """find the promotions with multiple attributes"""
+        current_date = datetime.now()
+        Promotion(
+            product_name="Macbook", 
+            category=TypeOfPromo.Discount, 
+            product_id=11111, amount=10, 
+            description="Gread Deal", 
+            from_date=current_date - timedelta(days=1), 
+            to_date=current_date + timedelta(days=5)
+            ).create()
+        Promotion(
+            product_name="iphone", 
+            category=TypeOfPromo.BOGOF, 
+            product_id=11112, amount=30, 
+            description="Gread Deal", 
+            from_date=current_date + timedelta(days=1), 
+            to_date=current_date + timedelta(days=7)
+            ).create() 
+        promotions = Promotion.all()
+        for promotion in promotions:
+            args = {
+                "category": promotion.category,
+                "product_name": promotion.product_name,
+                "paoduct_id": promotion.product_id,
+                "from_date": promotion.from_date,
+                "to_date": promotion.to_date,
+                "availablility": 1 if promotion.is_available() else 0
+            }
+            result = Promotion.find_by_multi_attributes(args)
+            self.assertEqual(promotion.id, result[0].id)
 

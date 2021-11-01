@@ -199,6 +199,20 @@ class TestYourResourceServer(TestCase):
         # check the data just to be sure
         for promotion in data:
             self.assertEqual(promotion["to_date"], test_to_date.isoformat())
+
+    def test_query_available_promotion_by_product(self):
+        """Query promotions by product_id and availability"""
+        promotions = self._create_promotions(10)
+        for test_promotion in promotions:
+            is_available = 1 if test_promotion.is_available() else 0
+            print(is_available)
+            resp = self.app.get(
+                "/promotions/product/{}/available/{}".format(test_promotion.product_id, is_available), content_type=CONTENT_TYPE_JSON
+            )
+            self.assertEqual(resp.status_code, status.HTTP_200_OK)
+            data = resp.get_json()
+            print(len(data))
+            self.assertEqual(data[0]["id"], test_promotion.id)
     
     ######################################################################
     # END

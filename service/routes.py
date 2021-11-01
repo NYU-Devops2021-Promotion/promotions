@@ -74,6 +74,27 @@ def list_promotions():
     return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################
+# LIST ALL AVAILABLE PROMOTIONS FOR SPECIFIC PRODUCT
+######################################################################
+@app.route("/promotions/product/<int:product_id>/available/<int:availability>", methods=["GET"])
+def list_available_promotions_by_product(product_id, availability):
+    """A single Multi-attributes query for available promotions with specific product_id
+    
+    Keyword arguments:
+    argument -- product_id, availability
+    Return: promotions list
+    """
+    app.logger.info("Request for available={} promotions with specific product_id={}".format(product_id, availability))
+    args = {
+        "product_id": product_id,
+        "availability": availability
+    }
+    promotions = Promotion.find_by_multi_attributes(args)
+    results = [promotion.serialize() for promotion in promotions]
+    app.logger.info("Returning {} promotions".format(len(results)))
+    return make_response(jsonify(results), status.HTTP_200_OK)
+
+######################################################################
 # RETRIEVE A PROMOTION
 ######################################################################
 @app.route("/promotions/<int:promotion_id>", methods=["GET"])

@@ -6,7 +6,7 @@ import logging
 import unittest
 import os
 from werkzeug.exceptions import NotFound
-from service.models import Promotion, TypeOfPromo, DataValidationError, db
+from service.models import Promotion, TypeOfPromo, StatusOfPromo, DataValidationError, db
 from service import app
 from .factories import PromotionFactory
 from datetime import datetime, timedelta
@@ -171,6 +171,7 @@ class TestPromotion(unittest.TestCase):
             "id": 1,
             "product_name": "iwatch",
             "category": "Discount",
+            "status": "Placed",
             "product_id": 100,
             "amount": 10,
             "description": "Great Deal",
@@ -183,6 +184,7 @@ class TestPromotion(unittest.TestCase):
         self.assertEqual(promotion.id, None)
         self.assertEqual(promotion.product_name, "iwatch")
         self.assertEqual(promotion.category, TypeOfPromo.Discount)
+        self.assertEqual(promotion.status, StatusOfPromo.Placed)
         self.assertEqual(promotion.product_id, 100)
         self.assertEqual(promotion.amount, 10)
         self.assertEqual(promotion.description, "Great Deal")

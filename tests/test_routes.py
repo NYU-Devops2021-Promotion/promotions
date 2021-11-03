@@ -211,6 +211,7 @@ class TestYourResourceServer(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
+
         self.assertEqual(len(data), len(availability_promotions))
         
         availability = 0
@@ -222,6 +223,24 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(len(data), len(availability_promotions))
+
+    def test_query_promotion_list_by_status(self):
+        """Query promotions by Availability"""
+        promotions = self._create_promotions(10)
+        test_status = promotions[0].status
+        logging.debug(test_status)
+        filtered_promotions = [promotion for promotion in promotions if promotion.status == test_status]
+        logging.debug(promotions[0])
+        resp = self.app.get(
+            BASE_URL, query_string="status={}".format((test_status))
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        logging.debug(data)
+        self.assertEqual(len(data), len(filtered_promotions))
+        # check the data just to be sure
+        for promotion in data:
+            self.assertEqual(promotion["status"], test_status.name)
 
     def test_query_promotion_list_by_multiAttri(self):
         """Query promotions by more than one attributes"""
@@ -296,18 +315,19 @@ class TestYourResourceServer(TestCase):
         updated_promotion = resp.get_json()
         self.assertEqual(updated_promotion["category"], "Unknown")
 
-    def test_expire_promotion(self):
-        """Expire a Promotion"""
+    def test_use_promotion(self):
+        """Use a Promotion"""
         new_promotion = self._create_promotions(1)[0]
+
         resp = self.app.put(
-            "/promotions/{}/expire".format(new_promotion.id),
+            "/promotions/{}/use".format(new_promotion.id),
             content_type=CONTENT_TYPE_JSON,
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_promotion = resp.get_json()
         logging.debug(updated_promotion)
 
-        self.assertEqual(updated_promotion["status"], "Expired")
+        self.assertEqual(updated_promotion["status"], "Used")
 
     def test_delete_promotion(self):
         """Delete a Promotion"""

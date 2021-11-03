@@ -171,7 +171,7 @@ class TestPromotion(unittest.TestCase):
             "id": 1,
             "product_name": "iwatch",
             "category": "Discount",
-            "status": "Placed",
+            "status": "Unused",
             "product_id": 100,
             "amount": 10,
             "description": "Great Deal",
@@ -184,7 +184,7 @@ class TestPromotion(unittest.TestCase):
         self.assertEqual(promotion.id, None)
         self.assertEqual(promotion.product_name, "iwatch")
         self.assertEqual(promotion.category, TypeOfPromo.Discount)
-        self.assertEqual(promotion.status, StatusOfPromo.Placed)
+        self.assertEqual(promotion.status, StatusOfPromo.Unused)
         self.assertEqual(promotion.product_id, 100)
         self.assertEqual(promotion.amount, 10)
         self.assertEqual(promotion.description, "Great Deal")
@@ -435,6 +435,34 @@ class TestPromotion(unittest.TestCase):
         promotion_list = [promotion for promotion in promotions]
         self.assertEqual(len(promotion_list), 2)
 
+    def test_find_by_status(self):
+        """Find promotions by status"""
+        Promotion(
+            product_name="Macbook", 
+            category=TypeOfPromo.Discount, 
+            product_id=11111, amount=10, description="Gread Deal", 
+            from_date=datetime(2021, 10, 13), 
+            to_date=datetime(2021, 10, 19),
+            status=StatusOfPromo.Unused
+            ).create()
+        Promotion(
+            product_name="iwatch", 
+            category=TypeOfPromo.BOGOF, 
+            product_id=11112, amount=20, 
+            description="Gread Deal", 
+            from_date=datetime(2021, 10, 14), 
+            to_date=datetime(2021, 10, 20),
+            status=StatusOfPromo.Used
+            ).create()
+        promotions = Promotion.find_by_status("StatusOfPromo.Used")
+        self.assertEqual(promotions[0].category, TypeOfPromo.BOGOF)
+        self.assertEqual(promotions[0].product_name, "iwatch")
+        self.assertEqual(promotions[0].product_id, 11112)
+        self.assertEqual(promotions[0].amount, 20)
+        self.assertEqual(promotions[0].description, "Gread Deal")
+        self.assertEqual(promotions[0].from_date, datetime(2021, 10, 14)) 
+        self.assertEqual(promotions[0].to_date, datetime(2021, 10, 20))
+
     def test_find_best_promotion(self):
         """find the best available promotion for a product"""
         current_date = datetime.now()
@@ -446,7 +474,8 @@ class TestPromotion(unittest.TestCase):
             product_id=11111, amount=10, 
             description="Gread Deal", 
             from_date=current_date - timedelta(days=1), 
-            to_date=current_date + timedelta(days=5)
+            to_date=current_date + timedelta(days=5),
+            status=StatusOfPromo.Unused 
         ).create()
         Promotion(
             product_name="Macbook", 
@@ -454,7 +483,8 @@ class TestPromotion(unittest.TestCase):
             product_id=11111, amount=20, 
             description="Gread Deal", 
             from_date=current_date - timedelta(days=1), 
-            to_date=current_date + timedelta(days=5)
+            to_date=current_date + timedelta(days=5),
+            status=StatusOfPromo.Unused 
         ).create()
         Promotion(
             product_name="Macbook", 
@@ -462,7 +492,17 @@ class TestPromotion(unittest.TestCase):
             product_id=11111, amount=30, 
             description="Gread Deal", 
             from_date=datetime(2021, 10, 7), 
-            to_date=datetime(2021, 10, 13)
+            to_date=datetime(2021, 10, 13),
+            status=StatusOfPromo.Unused
+        ).create() # invalid promotion
+        Promotion(
+            product_name="Macbook", 
+            category=TypeOfPromo.Discount, 
+            product_id=11111, amount=40, 
+            description="Gread Deal", 
+            from_date=current_date - timedelta(days=1), 
+            to_date=current_date + timedelta(days=5),
+            status=StatusOfPromo.Used # used promotion
         ).create() # invalid promotion
         Promotion(
             product_name="Macbook", 
@@ -470,7 +510,8 @@ class TestPromotion(unittest.TestCase):
             product_id=11111, amount=6, 
             description="Gread Deal", 
             from_date=current_date - timedelta(days=1), 
-            to_date=current_date + timedelta(days=5)
+            to_date=current_date + timedelta(days=5),
+            status=StatusOfPromo.Unused
         ).create()
         best_promotion = Promotion.find_best_promotion_for_product(11111)
         self.assertEqual(best_promotion.category, TypeOfPromo.Discount)

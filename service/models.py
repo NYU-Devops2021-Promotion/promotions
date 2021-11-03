@@ -30,9 +30,8 @@ class TypeOfPromo(Enum):
 
 class StatusOfPromo(Enum):
     """ Enumeration of valid Order Status """
-    Placed = 0
-    Expired = 1
-    Default = 3
+    Unused = 0
+    Used = 1
 
 class Promotion(db.Model):
     """
@@ -48,7 +47,7 @@ class Promotion(db.Model):
         db.Enum(TypeOfPromo), nullable=False, server_default=(TypeOfPromo.Unknown.name)
     )
     status = db.Column(
-        db.Enum(StatusOfPromo), nullable=False, server_default=(StatusOfPromo.Default.name)
+        db.Enum(StatusOfPromo), nullable=False, server_default=(StatusOfPromo.Unused.name)
     )
     product_id = db.Column(db.Integer, nullable=False)
     amount = db.Column(db.Integer, nullable=False) # xxx percent off, or Byu xxx get one free
@@ -129,6 +128,9 @@ class Promotion(db.Model):
 
     def is_available(self):
         return self.from_date <= datetime.now() and self.to_date >= datetime.now()
+
+    def is_used(self):
+        return self.status != StatusOfPromo.Used
 
     @classmethod
     def init_db(cls, app):
@@ -240,6 +242,23 @@ class Promotion(db.Model):
             )
 
     @classmethod
+    def find_by_status(cls, status:StatusOfPromo = StatusOfPromo.Unused) -> list:
+        """Returns all of the Promotions in a category
+
+        :param status: the status of the Promotions you want to match
+
+        :return: a collection of Promotionss in that category
+        :rtype: list
+
+        """
+        # if the category is input as string format such as "TypeOfPromo.Unknown", convert it to enum
+        if isinstance(status, str):
+            logger.info("status is %s: ", status)
+            status = StatusOfPromo[status.split('.')[-1]]
+        logger.info("Processing status query for %s ...", status.name)
+        return cls.query.filter(cls.status == status)
+
+    @classmethod
     def find_best_promotion_for_product(cls, product_id:int):
         """Returns the best available Promotion for a product""" 
 
@@ -248,6 +267,8 @@ class Promotion(db.Model):
             ).filter(
             cls.from_date <= datetime.now()).filter(
                 cls.to_date >= datetime.now()
+            ).filter(
+                cls.status == StatusOfPromo.Unused
             )
         promotion_list = [promotion for promotion in promotions]
         max_off = 0
@@ -286,6 +307,11 @@ class Promotion(db.Model):
                 )
             else:
                 result = result.filter(
-                    (cls.from_date > datetime.now()) | (datetime.now() > cls.to_date)
+                    (cls.from_date > datetime.now()) | (datetime.now() > cls.to_date) 
                 )
+        if "status" in args and args["status"]:
+            status = args["status"]
+            if isinstance(status, str):
+                status = StatusOfPromo[status.split('.')[-1]]
+            result = result.filter(cls.status == status)
         return result

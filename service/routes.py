@@ -55,20 +55,23 @@ def list_promotions():
     from_date = request.args.get("from_date")
     to_date = request.args.get("to_date")
     availabile = request.args.get("available")
+    status_ = request.args.get("status")
 
     args = {}
-    if category is not None:
+    if category:
         args["category"] = category
-    if name is not None:
+    if name:
         args["product_name"] = name
-    if product_id is not None:
+    if product_id:
         args["product_id"] = product_id
-    if from_date is not None:
+    if from_date:
         args["from_date"] = from_date
-    if to_date is not None:
+    if to_date:
         args["to_date"] = to_date
-    if availabile is not None:
+    if availabile:
         args["availability"] = availabile
+    if status_:
+        args["status"] = status_
     if len(args.keys()) > 0:
         promotions = Promotion.find_by_multi_attributes(args)
     else:
@@ -137,10 +140,10 @@ def update_promotions(promotion_id):
     return make_response(jsonify(promotion.serialize()), status.HTTP_200_OK)
 
 ######################################################################
-# EXPIRE AN EXISTING PROMOTION
+# USE AN EXISTING PROMOTION
 ######################################################################
-@app.route("/promotions/<int:promotion_id>/expire", methods=["PUT"])
-def expire_promotions(promotion_id):
+@app.route("/promotions/<int:promotion_id>/use", methods=["PUT"])
+def use_promotions(promotion_id):
     """
     Update a Promotion to expired status
 
@@ -151,7 +154,7 @@ def expire_promotions(promotion_id):
     if not promotion:
         raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
 
-    promotion.status = 'Expired'
+    promotion.status = 'Used'
     promotion.update()
 
     app.logger.info("Promotion with ID [%s] expired.", promotion.id)

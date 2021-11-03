@@ -136,6 +136,26 @@ def update_promotions(promotion_id):
     app.logger.info("Promotion with ID [%s] updated.", promotion.id)
     return make_response(jsonify(promotion.serialize()), status.HTTP_200_OK)
 
+######################################################################
+# EXPIRE AN EXISTING PROMOTION
+######################################################################
+@app.route("/promotions/<int:promotion_id>/expire", methods=["PUT"])
+def expire_promotions(promotion_id):
+    """
+    Update a Promotion to expired status
+
+    This endpoint will update a Promotion based the body that is posted
+    """
+    app.logger.info("Request to expire a promotion with id: %s", promotion_id)
+    promotion = Promotion.find(promotion_id)
+    if not promotion:
+        raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
+
+    promotion.status = 'Expired'
+    promotion.update()
+
+    app.logger.info("Promotion with ID [%s] expired.", promotion.id)
+    return make_response(jsonify(promotion.serialize()), status.HTTP_200_OK)
 
 ######################################################################
 # DELETE A PROMOTION

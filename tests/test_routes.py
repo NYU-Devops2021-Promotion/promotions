@@ -225,7 +225,7 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(len(data), len(availability_promotions))
 
     def test_query_promotion_list_by_status(self):
-        """Query promotions by Availability"""
+        """Query promotions by Status"""
         promotions = self._create_promotions(10)
         test_status = promotions[0].status
         logging.debug(test_status)

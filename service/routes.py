@@ -153,8 +153,9 @@ def use_promotions(promotion_id):
     promotion = Promotion.find(promotion_id)
     if not promotion:
         raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
-
-    promotion.status = 'Used'
+        
+    if promotion.is_available():
+        promotion.status = 'Used'
     promotion.update()
 
     app.logger.info("Promotion with ID [%s] used.", promotion.id)

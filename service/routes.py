@@ -145,11 +145,11 @@ def update_promotions(promotion_id):
 @app.route("/promotions/<int:promotion_id>/use", methods=["PUT"])
 def use_promotions(promotion_id):
     """
-    Update a Promotion to expired status
+    Use a Promotion and update its status
 
     This endpoint will update a Promotion based the body that is posted
     """
-    app.logger.info("Request to expire a promotion with id: %s", promotion_id)
+    app.logger.info("Request to use a promotion with id: %s", promotion_id)
     promotion = Promotion.find(promotion_id)
     if not promotion:
         raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
@@ -157,7 +157,7 @@ def use_promotions(promotion_id):
     promotion.status = 'Used'
     promotion.update()
 
-    app.logger.info("Promotion with ID [%s] expired.", promotion.id)
+    app.logger.info("Promotion with ID [%s] used.", promotion.id)
     return make_response(jsonify(promotion.serialize()), status.HTTP_200_OK)
 
 ######################################################################

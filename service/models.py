@@ -28,11 +28,6 @@ class TypeOfPromo(Enum):
     BOGOF = 1 # Buy xxx get one free
     Unknown = 3
 
-class StatusOfPromo(Enum):
-    """ Enumeration of valid Order Status """
-    Placed = 0
-    Expired = 1
-    Default = 3
 
 class Promotion(db.Model):
     """
@@ -46,9 +41,6 @@ class Promotion(db.Model):
     product_name = db.Column(db.String(63), nullable=False)
     category = db.Column(
         db.Enum(TypeOfPromo), nullable=False, server_default=(TypeOfPromo.Unknown.name)
-    )
-    status = db.Column(
-        db.Enum(StatusOfPromo), nullable=False, server_default=(StatusOfPromo.Default.name)
     )
     product_id = db.Column(db.Integer, nullable=False)
     amount = db.Column(db.Integer, nullable=False) # xxx percent off, or Byu xxx get one free
@@ -92,7 +84,6 @@ class Promotion(db.Model):
             "id": self.id,
             "product_name": self.product_name,
             "category": self.category.name,
-            "status": self.status.name,
             "product_id": self.product_id,
             "amount": self.amount,
             "description": self.description,
@@ -103,13 +94,13 @@ class Promotion(db.Model):
     def deserialize(self, data):
         """
         Deserializes a Promotion from a dictionary
+
         Args:
             data (dict): A dictionary containing the resource data
         """
         try:
             self.product_name = data["product_name"]
             self.category = getattr(TypeOfPromo, data["category"])
-            self.status = getattr(StatusOfPromo, data["status"])
             self.product_id = data['product_id']
             self.amount = data["amount"]
             self.description = data["description"]

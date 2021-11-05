@@ -296,19 +296,6 @@ class TestYourResourceServer(TestCase):
         updated_promotion = resp.get_json()
         self.assertEqual(updated_promotion["category"], "Unknown")
 
-    def test_expire_promotion(self):
-        """Expire a Promotion"""
-        new_promotion = self._create_promotions(1)[0]
-        resp = self.app.put(
-            "/promotions/{}/expire".format(new_promotion.id),
-            content_type=CONTENT_TYPE_JSON,
-        )
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        updated_promotion = resp.get_json()
-        logging.debug(updated_promotion)
-
-        self.assertEqual(updated_promotion["status"], "Expired")
-
     def test_delete_promotion(self):
         """Delete a Promotion"""
         test_promotion = self._create_promotions(1)[0]

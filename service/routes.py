@@ -154,6 +154,26 @@ def delete_promotions(promotion_id):
     return make_response("", status.HTTP_204_NO_CONTENT)
 
 ######################################################################
+# FIND THE BEST PROMOTION FOR A PRODUCT
+######################################################################
+@app.route("/promotions/<int:product_id>/best", methods=["GET"])
+def get_best_promotion(product_id):
+    """
+    Get the best promotion for a product
+    This endpoint will get the best promotion based the product's id specified in the path
+    """
+    app.logger.info("Request to get the best promotion with product: %s", product_id)
+    promotion = Promotion.find_best_promotion_for_product(int(product_id))
+
+    if not promotion:
+        raise NotFound("Promotion with product id '{}' was not found.".format(product_id))
+
+    app.logger.info("Returning best promotion: %s", promotion.product_name)
+    return make_response(jsonify(promotion.serialize()), status.HTTP_200_OK)
+
+    
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 

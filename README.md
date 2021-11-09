@@ -1,3 +1,5 @@
+[![Build Status](https://app.travis-ci.com/NYU-Devops2021-Promotion/promotions.svg?branch=master)](https://app.travis-ci.com/NYU-Devops2021-Promotion/promotions)
+
 # Promotions
 NYU Devops2021 Promotions
 

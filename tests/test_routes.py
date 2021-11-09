@@ -11,10 +11,12 @@ import logging
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 from service import status  # HTTP Status Codes
-from service.models import db
+from service.models import db, Promotion, TypeOfPromo
 from service.routes import app, init_db
 from urllib.parse import quote_plus
 from .factories import PromotionFactory
+from datetime import datetime, timedelta
+
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgres://postgres:postgres@localhost:5432/postgres"
@@ -111,6 +113,65 @@ class TestYourResourceServer(TestCase):
          """Create a promotion with no content type"""
          resp = self.app.post(BASE_URL)
          self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_get_best_promotion(self):
+        """Get the best promotion for a product"""
+        current_date = datetime.now()
+        resp = self.app.get(
+            "/promotions/{}/best".format(11111), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        promotions = []
+        promotions.append(Promotion(
+            product_name="Macbook", 
+            category=TypeOfPromo.Discount, 
+            product_id=11111, amount=10, 
+            description="Gread Deal", 
+            from_date=current_date - timedelta(days=1), 
+            to_date=current_date + timedelta(days=5)
+        ))
+        promotions.append(Promotion(
+            product_name="Macbook", 
+            category=TypeOfPromo.Discount, 
+            product_id=11111, amount=20, 
+            description="Gread Deal", 
+            from_date=current_date - timedelta(days=1), 
+            to_date=current_date + timedelta(days=5)
+        ))
+        promotions.append(Promotion(
+            product_name="Macbook", 
+            category=TypeOfPromo.Discount, 
+            product_id=11111, amount=30, 
+            description="Gread Deal", 
+            from_date=datetime(2021, 10, 7), 
+            to_date=datetime(2021, 10, 13)
+        ))# invalid promotion
+        promotions.append(Promotion(
+            product_name="Macbook", 
+            category=TypeOfPromo.BOGOF, 
+            product_id=11111, amount=6, 
+            description="Gread Deal", 
+            from_date=current_date - timedelta(days=1), 
+            to_date=current_date + timedelta(days=5)
+        ))
+        for promotion in promotions:
+            resp = self.app.post(
+                BASE_URL, json=promotion.serialize(), content_type=CONTENT_TYPE_JSON
+            )
+            self.assertEqual(
+                resp.status_code, status.HTTP_201_CREATED, "Could not create test promotion"
+            )
+        resp = self.app.get("/promotions/11111/best", content_type=CONTENT_TYPE_JSON)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        app.logger.info(data)
+        self.assertEqual(data["category"], TypeOfPromo.Discount.name)
+        self.assertEqual(data["product_name"], "Macbook")
+        self.assertEqual(data["product_id"], 11111)
+        self.assertEqual(data["amount"], 20)
+        self.assertEqual(data["description"], "Gread Deal")
+        self.assertEqual(data["from_date"], (current_date - timedelta(days=1)).isoformat())
+        self.assertEqual(data["to_date"], (current_date + timedelta(days=5)).isoformat())
 
     ######################################################################
     # Test quey promotion list

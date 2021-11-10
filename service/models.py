@@ -104,8 +104,20 @@ class Promotion(db.Model):
             self.product_id = data['product_id']
             self.amount = data["amount"]
             self.description = data["description"]
-            self.from_date = data["from_date"]
-            self.to_date = data["to_date"]
+
+            # convert str to datetime
+            if data["from_date"] and isinstance(data["from_date"], str):
+                self.from_date = datetime.fromisoformat(data["from_date"])
+            else:
+                self.from_date = data["from_date"]
+
+            if data["to_date"] and isinstance(data["to_date"], str):
+                self.to_date = datetime.fromisoformat(data["to_date"])
+            else:
+                self.to_date = data["to_date"]
+            #self.from_date = data["from_date"]
+            #self.to_date = data["to_date"]
+
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0])
         except KeyError as error:
@@ -120,7 +132,7 @@ class Promotion(db.Model):
 
     def is_available(self):
         return self.from_date <= datetime.now() and self.to_date >= datetime.now()
-
+   
     @classmethod
     def init_db(cls, app):
         """ Initializes the database session """

@@ -106,11 +106,15 @@ class Promotion(db.Model):
             self.description = data["description"]
 
             # convert str to datetime
-            if data["from_date"]!=None:
+            if data["from_date"] and isinstance(data["from_date"], str):
                 self.from_date = datetime.fromisoformat(data["from_date"])
-            if data["to_date"]!=None:
-                self.to_date = datetime.fromisoformat(data["to_date"])
+            else:
+                self.from_date = data["from_date"]
 
+            if data["to_date"] and isinstance(data["to_date"], str):
+                self.to_date = datetime.fromisoformat(data["to_date"])
+            else:
+                self.to_date = data["to_date"]
             #self.from_date = data["from_date"]
             #self.to_date = data["to_date"]
 

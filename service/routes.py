@@ -16,7 +16,7 @@ import logging
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from . import status  # HTTP Status Codes
 from werkzeug.exceptions import NotFound
-
+from datetime import datetime, timedelta
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
@@ -136,6 +136,28 @@ def update_promotions(promotion_id):
     app.logger.info("Promotion with ID [%s] updated.", promotion.id)
     return make_response(jsonify(promotion.serialize()), status.HTTP_200_OK)
 
+######################################################################
+# UPDATE AN EXISTING PROMOTION TO EXPIRED STATE
+######################################################################
+@app.route("/promotions/<int:promotion_id>/expire", methods=["PUT"])
+def expire_promotions(promotion_id):
+    """
+    Set a Promotion to expired
+
+    This endpoint will update a Promotion based the body that is posted
+    """
+    app.logger.info("Request to expire promotion with id: %s", promotion_id)
+    promotion = Promotion.find(promotion_id)
+    
+    if not promotion:
+        raise NotFound("Promotion with id '{}' was not found.".format(promotion_id))
+
+    # Set the to-date to 1 day before from-date
+    promotion.to_date = promotion.from_date-timedelta(days=1) 
+    promotion.update()
+
+    app.logger.info("Promotion with ID [%s] expired.", promotion.id)
+    return make_response(jsonify(promotion.serialize()), status.HTTP_200_OK)
 
 ######################################################################
 # DELETE A PROMOTION

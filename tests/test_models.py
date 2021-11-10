@@ -174,8 +174,8 @@ class TestPromotion(unittest.TestCase):
             "product_id": 100,
             "amount": 10,
             "description": "Great Deal",
-            "from_date": datetime(2021, 10, 13),
-            "to_date": datetime(2021, 10, 19),
+            "from_date": str(datetime(2021, 10, 13)),
+            "to_date": str(datetime(2021, 10, 19)),
         }
         promotion = Promotion()
         promotion.deserialize(data)

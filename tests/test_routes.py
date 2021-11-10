@@ -335,6 +335,28 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(new_promotion["product_name"], test_promotion.product_name, "Name does not match")
         self.assertEqual(new_promotion["to_date"], test_promotion.to_date.isoformat(), "To date does not match")
 
+    def test_expire_promotion(self):
+        """Expire an existing Promotion"""
+        # create a promotion to update
+        test_promotion = self._create_promotions(1)[0]
+
+        test_promotion.from_date = datetime.now() - timedelta(days=1) 
+        test_promotion.to_date = datetime.now() + timedelta(days=1) 
+        self.assertEqual(test_promotion.is_available(), True)
+        logging.debug(test_promotion.from_date)
+
+        resp = self.app.put(
+            "/promotions/{}/expire".format(test_promotion.id),
+            content_type=CONTENT_TYPE_JSON,
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.get_json()
+        test_promotion.deserialize(data)
+        logging.debug(test_promotion)
+
+        self.assertEqual(test_promotion.is_available(), False)
+
     def test_update_promotion(self):
         """Update an existing Promotion"""
         # create a promotion to update

@@ -14,3 +14,10 @@ Scenario: The server is running
     When I visit the "home page"
     Then I should see "Promotion REST API Service"
     And  I should not see "404 Not Found"
+
+Scenario: List all promotions
+    When I visit the "Home Page"
+    And I press the "Search" button
+    Then I should see "Macbook" in the results
+    And I should see "iwatch" in the results
+    And I should not see "iphone" in the results

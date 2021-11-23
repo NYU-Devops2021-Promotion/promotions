@@ -32,6 +32,7 @@ from . import app
 @app.route("/")
 def index():
     """ Root URL response """
+    '''
     return (
         jsonify(
             name="Promotion REST API Service",
@@ -40,6 +41,8 @@ def index():
         ),
         status.HTTP_200_OK,
     )
+    '''
+    return app.send_static_file("index.html")
     
 ######################################################################
 # LIST ALL PROMOTIONS

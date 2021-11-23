@@ -42,13 +42,15 @@ Vagrant.configure(2) do |config|
   ############################################################
   config.vm.provider :docker do |docker, override|
     override.vm.box = nil
-    docker.image = "rofrano/vagrant-provider:ubuntu"
+    # Chromium driver does not work with ubuntu so we use debian
+    override.vm.hostname = "debian"
+    docker.image = "rofrano/vagrant-provider:debian"
     docker.remains_running = true
     docker.has_ssh = true
     docker.privileged = true
     docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:ro"]
     # Uncomment to force arm64 for testing images on Intel
-    # docker.create_args = ["--platform=linux/arm64"]     
+    # docker.create_args = ["--platform=linux/arm64"] 
   end
 
 
@@ -91,6 +93,9 @@ Vagrant.configure(2) do |config|
     # Need PostgreSQL development library to compile on arm64
     apt-get install -y libpq-dev
 
+    # Install Chromium Driver
+    apt-get install -y chromium-driver
+
     # Create a Python3 Virtual Environment and Activate it in .profile
     sudo -H -u vagrant sh -c 'python3 -m venv ~/venv'
     sudo -H -u vagrant sh -c 'echo ". ~/venv/bin/activate" >> ~/.profile'
@@ -117,21 +122,26 @@ Vagrant.configure(2) do |config|
     echo "\n************************************"
     echo " Installing IBM Cloud CLI..."
     echo "************************************\n"
+    # WARNING!!! This only works on Intel computers
     # Install IBM Cloud CLI as Vagrant user
-    sudo -H -u vagrant sh -c '
-    curl -fsSL https://clis.cloud.ibm.com/install/linux | sh && \
-    ibmcloud cf install && \
-    echo "alias ic=ibmcloud" >> ~/.bashrc
-    '
+    ARCH=$(dpkg --print-architecture)
+    if [ "$ARCH" == "amd64" ]
+    then
+      curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
+      sudo -H -u vagrant bash -c '
+          echo "alias ic=/usr/local/bin/ibmcloud" >> ~/.bash_aliases &&
+          ibmcloud cf install'
+    else
+      echo "*** WARNING: IBM Cloud CLI does not suport your architecture :("; \
+    fi
 
-    # Show completion instructions
-    sudo -H -u vagrant sh -c "echo alias ic=/usr/local/bin/ibmcloud >> ~/.bash_aliases"
     echo "\n************************************"
-    echo "If you have an IBM Cloud API key in ~/.bluemix/apiKey.json"
+    echo ""
+    echo "If you have an IBM Cloud API key in ~/.bluemix/apikey.json"
     echo "You can login with the following command:"
-    echo "\n"
+    echo ""
     echo "ibmcloud login -a https://cloud.ibm.com --apikey @~/.bluemix/apikey.json -r us-south"
-    echo "ibmcloud target --cf -o <your_org_here> -s dev"
+    echo "\nibmcloud target --cf"
     echo "\n************************************"
   SHELL
 

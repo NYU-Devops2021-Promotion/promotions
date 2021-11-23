@@ -12,7 +12,7 @@ Background:
 
 Scenario: The server is running
     When I visit the "home page"
-    Then I should see "Promotion REST API Service"
+    Then I should see "Promotion REST API Service" in the title
     And  I should not see "404 Not Found"
 
 Scenario: List all promotions

@@ -168,7 +168,6 @@ $(function () {
     // ****************************************
 
     $("#clear-btn").click(function () {
-        alert("hiadh!")
         $("#promotion_id").val("");
         clear_form_data()
     });

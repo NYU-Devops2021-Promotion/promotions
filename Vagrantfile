@@ -43,7 +43,6 @@ Vagrant.configure(2) do |config|
   config.vm.provider :docker do |docker, override|
     override.vm.box = nil
     # Chromium driver does not work with ubuntu so we use debian
-    override.vm.hostname = "debian"
     docker.image = "rofrano/vagrant-provider:debian"
     docker.remains_running = true
     docker.has_ssh = true

@@ -7,8 +7,8 @@ $(function () {
     // Updates the form with data from the response
     function update_form_data(res) {
         $("#promotion_id").val(res.id);
-        $("#product_id").val(res.product_id);
-        $("#product_name").val(res.product_name);
+        $("#promotion_product_id").val(res.product_id);
+        $("#promotion_product_name").val(res.product_name);
         $("#promotion_category").val(res.category);
         $("#promotion_amount").val(res.amount);
         $("#promotion_description").val(res.description);
@@ -19,8 +19,8 @@ $(function () {
     /// Clears all form fields
     function clear_form_data() {
         $("#promotion_id").val("");
-        $("#product_id").val("");
-        $("#product_name").val("");
+        $("#promotion_product_id").val("");
+        $("#promotion_product_name").val("");
         $("#promotion_category").val("");
         $("#promotion_amount").val("");
         $("#promotion_from_date").val("");
@@ -39,8 +39,8 @@ $(function () {
 
     $("#create-btn").click(function () {
         var id = parseInt($("#promotion_id").val());
-        var product_id = parseInt($("#product_id").val());
-        var name = $("#product_name").val();
+        var product_id = parseInt($("#promotion_product_id").val());
+        var name = $("#promotion_product_name").val();
         var category = $("#promotion_category").val();
         var amount = parseInt($("#promotion_amount").val());
         var description = $("#promotion_description").val();
@@ -83,8 +83,8 @@ $(function () {
 
     $("#update-btn").click(function () {
         var id = parseInt($("#promotion_id").val());
-        var product_id = parseInt($("#product_id").val());
-        var name = $("#product_name").val();
+        var product_id = parseInt($("#promotion_product_id").val());
+        var name = $("#promotion_product_name").val();
         var category = $("#promotion_category").val();
         var amount = parseInt($("#promotion_amount").val());
         var description = $("#promotion_description").val();
@@ -178,7 +178,7 @@ $(function () {
     // ****************************************
 
     $("#clear-btn").click(function () {
-        $("#product_id").val("");
+        $("#promotion_product_id").val("");
         clear_form_data()
     });
 
@@ -188,8 +188,8 @@ $(function () {
 
     $("#search-btn").click(function () {
         var id = parseInt($("#promotion_id").val());
-        var product_id = $("#product_id").val();
-        var name = $("#product_name").val();
+        var product_id = $("#promotion_product_id").val();
+        var name = $("#promotion_product_name").val();
         var category = $("#promotion_category").val();
         var from_date = $("#promotion_from_date").val();
         var to_date = $("#promotion_to_date").val();

@@ -37,13 +37,13 @@ Vagrant.configure(2) do |config|
     vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
   end
 
-  ############################################################
-  # Provider for Docker on Intel or ARM (aarch64)
+ ############################################################
+  # Provider for Docker
   ############################################################
   config.vm.provider :docker do |docker, override|
     override.vm.box = nil
     # Chromium driver does not work with ubuntu so we use debian
-    override.vm.hostname = "debian"
+
     docker.image = "rofrano/vagrant-provider:debian"
     docker.remains_running = true
     docker.has_ssh = true
@@ -87,14 +87,16 @@ Vagrant.configure(2) do |config|
     echo "****************************************"
     # Install Python 3 and dev tools 
     apt-get update
-    apt-get install -y git vim tree python3 python3-pip python3-venv
+    apt-get install -y git vim tree python3 python3-pip python3-venv python3-selenium
     apt-get -y autoremove
     
     # Need PostgreSQL development library to compile on arm64
     apt-get install -y libpq-dev
 
     # Install Chromium Driver
-    apt-get install -y chromium-driver
+    apt-get install chromium-browser
+    apt-get install chromium-driver
+    chromedriver --version
 
     # Create a Python3 Virtual Environment and Activate it in .profile
     sudo -H -u vagrant sh -c 'python3 -m venv ~/venv'

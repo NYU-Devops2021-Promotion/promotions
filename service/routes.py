@@ -32,6 +32,7 @@ from . import app
 @app.route("/")
 def index():
     """ Root URL response """
+    '''
     return (
         jsonify(
             name="Promotion REST API Service",
@@ -40,6 +41,8 @@ def index():
         ),
         status.HTTP_200_OK,
     )
+    '''
+    return app.send_static_file("index.html")
     
 ######################################################################
 # LIST ALL PROMOTIONS
@@ -67,6 +70,7 @@ def list_promotions():
         args["from_date"] = from_date
     if to_date is not None:
         args["to_date"] = to_date
+
     if availabile is not None:
         args["availability"] = availabile
     if len(args.keys()) > 0:
@@ -76,6 +80,8 @@ def list_promotions():
 
     results = [promotion.serialize() for promotion in promotions]
     app.logger.info("Returning %d promotions", len(results))
+    app.logger.info((results))
+
     return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################

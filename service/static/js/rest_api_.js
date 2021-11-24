@@ -80,7 +80,7 @@ $(function () {
     // ****************************************
 
     $("#update-btn").click(function () {
-
+        var id = parseInt($("#promotion_id").val());
         var product_id = parseInt($("#product_id").val());
         var name = $("#product_name").val();
         var category = $("#promotion_category").val();
@@ -91,6 +91,7 @@ $(function () {
 
         console.log(product_id, name, from_date, to_date);
         var data = {
+            'id': id,
             'product_id': product_id,
             "product_name": name,
             "category": category,
@@ -99,7 +100,6 @@ $(function () {
             "from_date": from_date,
             "to_date": to_date,
         };
-
 
         var ajax = $.ajax({
                 type: "PUT",
@@ -152,11 +152,11 @@ $(function () {
 
     $("#delete-btn").click(function () {
 
-        var product_id = $("#product_id").val();
+        var id = $("#promotion_id").val();
          
         var ajax = $.ajax({
             type: "DELETE",
-            url: "/promotions/" + product_id,
+            url: "/promotions/" + id,
             contentType: "application/json",
             data: '',
         })

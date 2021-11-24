@@ -6,17 +6,19 @@ $(function () {
 
     // Updates the form with data from the response
     function update_form_data(res) {
+        $("#promotion_id").val(res.id);
         $("#product_id").val(res.product_id);
         $("#product_name").val(res.product_name);
         $("#promotion_category").val(res.category);
         $("#promotion_amount").val(res.amount);
         $("#promotion_description").val(res.description);
-        $("#promotion_from_date").val(res.from_date);
-        $("#promotion_to_date").val(res.to_date);
+        $("#promotion_from_date").val(res.from_date.substring(0, 10));
+        $("#promotion_to_date").val(res.to_date.substring(0, 10));
     }
 
     /// Clears all form fields
     function clear_form_data() {
+        $("#promotion_id").val("");
         $("#product_id").val("");
         $("#product_name").val("");
         $("#promotion_category").val("");
@@ -103,7 +105,7 @@ $(function () {
 
         var ajax = $.ajax({
                 type: "PUT",
-                url: "/promotions/" + product_id,
+                url: "/promotions/" + id,
                 contentType: "application/json",
                 data: JSON.stringify(data)
             })

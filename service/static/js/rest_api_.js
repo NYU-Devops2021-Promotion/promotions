@@ -2,23 +2,23 @@ $(function () {
     // ****************************************
     //  U T I L I T Y   F U N C T I O N S
     // ****************************************
-    document.getElementById("promotion_category").selectedIndex = -1;
+    $("#promotion_category").val("");
 
     // Updates the form with data from the response
     function update_form_data(res) {
-        $("#promotion_id").val(res.product_id);
-        $("#promotion_name").val(res.product_name);
-        //$("#promotion_category").val(res.category);
+        $("#product_id").val(res.product_id);
+        $("#product_name").val(res.product_name);
+        $("#promotion_category").val(res.category);
         $("#promotion_amount").val(res.amount);
+        $("#promotion_description").val(res.description);
         $("#promotion_from_date").val(res.from_date);
         $("#promotion_to_date").val(res.to_date);
-
     }
 
     /// Clears all form fields
     function clear_form_data() {
-        $("#promotion_id").val("");
-        $("#promotion_name").val("");
+        $("#product_id").val("");
+        $("#product_name").val("");
         $("#promotion_category").val("");
         $("#promotion_amount").val("");
         $("#promotion_from_date").val("");
@@ -37,16 +37,18 @@ $(function () {
 
     $("#create-btn").click(function () {
         var id = parseInt($("#promotion_id").val());
-        var name = $("#promotion_name").val();
+        var product_id = parseInt($("#product_id").val());
+        var name = $("#product_name").val();
         var category = $("#promotion_category").val();
         var amount = parseInt($("#promotion_amount").val());
         var description = $("#promotion_description").val();
         var from_date = ($("#promotion_from_date").val());
         var to_date = ($("#promotion_to_date").val());
 
-        console.log(id, name, from_date, to_date);
+        console.log(product_id, name, from_date, to_date);
         var data = {
-            'product_id': id,
+            'id': id,
+            'product_id': product_id,
             "product_name": name,
             "category": category,
             "amount": amount,
@@ -79,23 +81,29 @@ $(function () {
 
     $("#update-btn").click(function () {
 
-        var id = $("#promotion_id").val();
-        var name = $("#promotion_name").val();
+        var product_id = parseInt($("#product_id").val());
+        var name = $("#product_name").val();
         var category = $("#promotion_category").val();
-        var from_date = new Date($("#promotion_from_date").val());
-        var to_date = new Date($("#promotion_to_date").val());
-        alert(from_date, to_date);
+        var amount = parseInt($("#promotion_amount").val());
+        var description = $("#promotion_description").val();
+        var from_date = ($("#promotion_from_date").val());
+        var to_date = ($("#promotion_to_date").val());
 
+        console.log(product_id, name, from_date, to_date);
         var data = {
-            'product_id': id,
+            'product_id': product_id,
             "product_name": name,
             "category": category,
+            "amount": amount,
+            "description": description,
             "from_date": from_date,
             "to_date": to_date,
         };
+
+
         var ajax = $.ajax({
                 type: "PUT",
-                url: "/promotions/" + id,
+                url: "/promotions/" + product_id,
                 contentType: "application/json",
                 data: JSON.stringify(data)
             })
@@ -144,11 +152,11 @@ $(function () {
 
     $("#delete-btn").click(function () {
 
-        var id = $("#promotion_id").val();
+        var product_id = $("#product_id").val();
          
         var ajax = $.ajax({
             type: "DELETE",
-            url: "/promotions/" + id,
+            url: "/promotions/" + product_id,
             contentType: "application/json",
             data: '',
         })
@@ -168,7 +176,7 @@ $(function () {
     // ****************************************
 
     $("#clear-btn").click(function () {
-        $("#promotion_id").val("");
+        $("#product_id").val("");
         clear_form_data()
     });
 
@@ -177,15 +185,19 @@ $(function () {
     // ****************************************
 
     $("#search-btn").click(function () {
-        var id = $("#promotion_id").val();
-        var name = $("#promotion_name").val();
+        var id = parseInt($("#promotion_id").val());
+        var product_id = $("#product_id").val();
+        var name = $("#product_name").val();
         var category = $("#promotion_category").val();
         var from_date = $("#promotion_from_date").val();
         var to_date = $("#promotion_to_date").val();
 
         var queryString = ""
         if (id) {
-            queryString += 'product_id=' + id
+            queryString += 'id=' + id
+        }
+        if (product_id) {
+            queryString += '&product_id=' + product_id
         }
         if (name) {
             queryString += '&product_name=' + name
@@ -214,7 +226,8 @@ $(function () {
             $("#search_results").append('<table class="table-striped" cellpadding="10">');
             var header = '<tr>'
             header += '<th style="width:20%">ID</th>'
-            header += '<th style="width:20%">Name</th>'
+            header += '<th style="width:20%">Product ID</th>'
+            header += '<th style="width:20%">Product Name</th>'
             header += '<th style="width:20%">Category</th>'
             header += '<th style="width:30%">From</th>'
             header += '<th style="width:30%">To</th></tr>'
@@ -222,7 +235,7 @@ $(function () {
             var firstpromotion = "";
             for(var i = 0; i < res.length; i++) {
                 var promotion = res[i];
-                var row = "<tr><td>"+promotion.product_id+"</td><td>"+promotion.product_name+"</td><td>"+promotion.category+"</td><td>"+promotion.from_date+"</td><td>"+promotion.to_date+"</td></tr>";
+                var row = "<tr><td>"+promotion.id+"</td><td>"+promotion.product_id+"</td><td>"+promotion.product_name+"</td><td>"+promotion.category+"</td><td>"+promotion.from_date+"</td><td>"+promotion.to_date+"</td></tr>";
                 $("#search_results").append(row);
                 if (i == 0) {
                     firstpromotion = promotion;

@@ -10,6 +10,7 @@ BASE_URL = getenv('BASE_URL', 'http://localhost:5000')
 
 def before_all(context):
     """ Executed once before all tests """
+
     options = webdriver.ChromeOptions()
     options.add_argument("start-maximized") # open Browser in maximized mode
     options.add_argument("disable-infobars") # disabling infobars
@@ -23,6 +24,7 @@ def before_all(context):
     context.driver.implicitly_wait(context.WAIT_SECONDS) # seconds
     # context.driver.set_window_size(1200, 600)
 
+
     context.base_url = BASE_URL
     # -- SET LOG LEVEL: behave --logging-level=ERROR ...
     # on behave command-line or in "behave.ini"
@@ -32,3 +34,4 @@ def before_all(context):
 def after_all(context):
     """ Executed after all tests """
     context.driver.quit()
+

@@ -70,6 +70,7 @@ def list_promotions():
         args["from_date"] = from_date
     if to_date is not None:
         args["to_date"] = to_date
+
     if availabile is not None:
         args["availability"] = availabile
     if len(args.keys()) > 0:
@@ -79,6 +80,8 @@ def list_promotions():
 
     results = [promotion.serialize() for promotion in promotions]
     app.logger.info("Returning %d promotions", len(results))
+    app.logger.info((results))
+
     return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################

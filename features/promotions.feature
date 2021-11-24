@@ -20,4 +20,4 @@ Scenario: List all promotions
     And I press the "Search" button
     Then I should see "Macbook" in the results
     And I should see "iwatch" in the results
-    And I should not see "iphone" in the results
+    And I should see "iphone" in the results

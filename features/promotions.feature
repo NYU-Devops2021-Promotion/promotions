@@ -28,6 +28,36 @@ Scenario: List all promotions
     And I should see "iphone" in the results
     And I should see "BOGOF" in the results
 
+Scenario: Create all promotions
+    When I visit the "Home Page"
+    And I set the "product_id" to "11114"
+    And I set the "product_name" to "iPad"
+    And I select "Discount" in the "category" dropdown
+    And I set the "amount" to "15"
+    And I set the "description" to "Great Deal"
+    And I set the "from_date" to "10-07-2021"
+    And I set the "to_date" to "10-07-2022"
+    And I press the "Create" button
+    Then I should see the message "Success"
+    When I copy the "id" field
+    And I press the "Clear" button
+    Then the "id" field should be empty
+    And the "product_id" field should be empty
+    And the "product_name" field should be empty
+    And the "category" field should be empty
+    And the "amount" field should be empty 
+    And the "from_date" field should be empty
+    And the "to_date" field should be empty
+    When I paste the "id" field
+    And I press the "Retrieve" button
+    Then I should see "11114" in the "product_id" field
+    And I should see "iPad" in the "product_name" field
+    And I should see "Discount" in the "category" dropdown
+    And I should see "15" in the "amount" field
+    And I should see "Great Deal" in the "description" field
+    And I should see "2021-10-07" in the "from_date" field
+    And I should see "2022-10-07" in the "to_date" field
+
 Scenario: Read all promotions
     When I visit the "Home Page"
     And I set the "product_id" to "11113"
@@ -57,3 +87,20 @@ Scenario: Read all promotions
     And I should see "Great Deal" in the "description" field
     And I should see "2021-10-07" in the "from_date" field
     And I should see "2022-10-07" in the "to_date" field
+
+Scenario: Update a promotion
+    When I visit the "Home Page"
+    And I select "Discount" in the "category" dropdown
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Discount" in the "category" dropdown
+    When I select "BOGOF" in the "category" dropdown
+    And I press the "Update" button
+    Then I should see the message "Success"
+    When I copy the "id" field
+    And I press the "Clear" button
+    When I paste the "id" field
+    And I press the "Retrieve" button
+    Then I should see "BOGOF" in the "category" dropdown
+
+    

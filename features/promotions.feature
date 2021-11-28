@@ -103,11 +103,11 @@ Scenario: Update a promotion
     And I press the "Retrieve" button
     Then I should see "BOGOF" in the "category" dropdown
 
-Scenario: Query a promotion
+Scenario: Promotion Action Test
     When I visit the "Home Page"
     And I press the "Search" button
     Then I should see the message "Success"
-    When I press the "Best" button
+    When I press the "Expire" button
     Then I should see the message "Success"
     And I should see "11111" in the "product_id" field
     And I should see "Macbook" in the "product_name" field
@@ -115,4 +115,25 @@ Scenario: Query a promotion
     And I should see "10" in the "amount" field
     And I should see "Great Deal" in the "description" field
     And I should see "2021-10-07" in the "from_date" field
-    And I should see "2022-10-07" in the "to_date" field
+    And I should see "2021-10-06" in the "to_date" field
+    When I press the "Clear" button
+    Then I should see the message "Success"
+    When I press the "Search" button
+    Then I should see the message "Success"
+    And I should not see "Macbook" in the results
+    And I should not see "Discount" in the results
+    And I should not see "11111" in the results
+    And I should not see "2021-10-06" in the results
+
+Scenario: Query the best promotion
+    When I visit the "Home Page"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    When I press the "Best" button
+    Then I should see the message "Success"
+    And I should see "Macbook" in the results
+    And I should see "Discount" in the results
+    And I should see "11111" in the results
+    And I should see "2021-10-07" in the results
+    And I should see "2022-10-07" in the results
+

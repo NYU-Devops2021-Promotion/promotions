@@ -5,10 +5,10 @@ from . import app, status
 ######################################################################
 # Error Handlers
 ######################################################################
-@app.errorhandler(DataValidationError)
-def request_validation_error(error):
-    """ Handles Value Errors from bad data """
-    return bad_request(error)
+# @app.errorhandler(DataValidationError)
+# def request_validation_error(error):
+#     """ Handles Value Errors from bad data """
+#     return bad_request(error)
 
 
 @app.errorhandler(status.HTTP_400_BAD_REQUEST)

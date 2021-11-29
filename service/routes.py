@@ -44,12 +44,12 @@ def index():
 api = Api(app,
           version='1.0.0',
           title='Promotion Demo REST API Service',
-          description='This is a sample server Pet store server.',
-          default='pets',
+          description='This is a sample server Promotion server.',
+          default='promotions',
           default_label='Promotion operations',
           doc='/apidocs', # default also could use doc='/apidocs/'
           #authorizations=authorizations,
-          prefix='/api'
+          #prefix='/api'
          )
 
 
@@ -63,7 +63,7 @@ create_model = api.model('Promotion', {
                               description='The id of the product this promotion is for'),
     "amount": fields.Integer(required=True,
                               description='The value of the Promotion (e.g., 25 percent off, buy 1 get one free, etc.)'),
-    "description": fields.String(required=True,
+    "description": fields.String(required=False,
                               description='The description of the promotion'),
     "from_date": fields.String(required=True,
                                 description='The start date of the promotion (e.g., 2021-11-28)'),
@@ -119,7 +119,7 @@ class PromotionResource(Resource):
     DELETE /promotion{id} -  Deletes a Promotion with the id
     """
     #------------------------------------------------------------------
-    # RETRIEVE A PET
+    # RETRIEVE A PROMOTION
     #------------------------------------------------------------------
     @api.doc('get_promotions')
     @api.response(404, 'Promotion not found')
@@ -139,11 +139,11 @@ class PromotionResource(Resource):
         return promotion.serialize(), status.HTTP_200_OK
 
     #------------------------------------------------------------------
-    # UPDATE AN EXISTING PET
+    # UPDATE AN EXISTING PROMOTION
     #------------------------------------------------------------------
-    @api.doc('update_pets')
-    @api.response(404, 'Pet not found')
-    @api.response(400, 'The posted Pet data was not valid')
+    @api.doc('update_promotions')
+    @api.response(404, 'Promotion not found')
+    @api.response(400, 'The posted Promotion data was not valid')
     @api.expect(promotion_model)
     @api.marshal_with(promotion_model)
     def put(self, promotion_id):
@@ -162,10 +162,10 @@ class PromotionResource(Resource):
         return promotion.serialize(), status.HTTP_200_OK
 
     #------------------------------------------------------------------
-    # DELETE A PET
+    # DELETE A PROMOTION
     #------------------------------------------------------------------
-    @api.doc('delete_pets')
-    @api.response(204, 'Pet deleted')
+    @api.doc('delete_promotions')
+    @api.response(204, 'Promotion deleted')
     def delete(self, promotion_id):
         """
         Delete a promotion
@@ -185,7 +185,7 @@ class PromotionResource(Resource):
 ######################################################################
 @api.route('/promotions', strict_slashes=False)
 class PromotionCollection(Resource):
-    """ Handles all interactions with collections of Pets """
+    """ Handles all interactions with collections of Promotions """
     #------------------------------------------------------------------
     # LIST ALL PROMOTIONS
     #------------------------------------------------------------------
@@ -197,6 +197,7 @@ class PromotionCollection(Resource):
         app.logger.info("Request for promotion list")
         promotions = []
         args = pro_args.parse_args()
+        app.logger.info(args)
         app.logger.info('Filtering list')
         promotions = Promotion.find_by_multi_attributes(args)
 
@@ -236,7 +237,7 @@ class PromotionCollection(Resource):
 class ExpireResource(Resource):
     """Expire actions on a promotion"""
     @api.doc('expire_promotions')
-    @api.response(404, 'Pet not found')
+    @api.response(404, 'Promotion not found')
     def put(self, promotion_id):
         """
         Set a Promotion to expired

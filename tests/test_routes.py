@@ -25,7 +25,7 @@ DATABASE_URI = os.getenv(
 if 'VCAP_SERVICES' in os.environ:
     vcap = json.loads(os.environ['VCAP_SERVICES'])
     DATABASE_URI = vcap['user-provided'][0]['credentials']['url']
-BASE_URL = "/api/promotions"
+BASE_URL = "/promotions"
 CONTENT_TYPE_JSON = "application/json"
 ######################################################################
 #  T E S T   C A S E S
@@ -314,10 +314,8 @@ class TestYourResourceServer(TestCase):
     def test_create_promotion(self):
         """Create a new Promotion"""
         test_promotion = PromotionFactory()
-        data = test_promotion.serialize()
-        del data['id']
         resp = self.app.post(
-            BASE_URL, json=data, content_type=CONTENT_TYPE_JSON
+            BASE_URL, json=test_promotion.serialize(), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         # Make sure location header is set

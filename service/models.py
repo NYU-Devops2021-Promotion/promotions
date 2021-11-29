@@ -279,8 +279,8 @@ class Promotion(db.Model):
             result = result.filter(cls.from_date == args["from_date"])
         if "to_date" in args and args["to_date"] is not None:
             result = result.filter(cls.to_date == args["to_date"])
-        if "availability" in args and args["availability"] is not None:
-            if int(args["availability"]) > 0:
+        if "available" in args and args["available"] is not None:
+            if int(args["available"]) > 0:
                 result = result.filter(
                 cls.from_date <= datetime.now()).filter(
                     cls.to_date >= datetime.now()

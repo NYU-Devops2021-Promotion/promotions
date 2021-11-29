@@ -63,8 +63,8 @@ create_model = api.model('Promotion', {
                               description='The id of the product this promotion is for'),
     "amount": fields.Integer(required=True,
                               description='The value of the Promotion (e.g., 25 percent off, buy 1 get one free, etc.)'),
-    # "description": fields.String(required=True,
-    #                           description='The description of the promotion'),
+    "description": fields.String(required=True,
+                              description='The description of the promotion'),
     "from_date": fields.String(required=True,
                                 description='The start date of the promotion (e.g., 2021-11-28)'),
     "to_date": fields.String(required=True,
@@ -88,6 +88,7 @@ pro_args.add_argument('product_id', type=int, required=False, help='List Promoti
 pro_args.add_argument('category', type=str, required=False, help='List Promotions by category')
 pro_args.add_argument('from_date', type=str, required=False, help='List Promotions by start date')
 pro_args.add_argument('to_date', type=str, required=False, help='List Promotions by end date')
+pro_args.add_argument('available', type=int, required=False, help='List Promotions by availability, (e.g. 1=available, 0=not_available')
 
 ######################################################################
 # Special Error Handlers
@@ -123,7 +124,7 @@ class PromotionResource(Resource):
     @api.doc('get_promotions')
     @api.response(404, 'Promotion not found')
     @api.marshal_with(promotion_model)
-    def get_promotions(self, promotion_id):
+    def get(self, promotion_id):
         """
         Retrieve a single promotion
 
@@ -145,7 +146,7 @@ class PromotionResource(Resource):
     @api.response(400, 'The posted Pet data was not valid')
     @api.expect(promotion_model)
     @api.marshal_with(promotion_model)
-    def update_promotions(self, promotion_id):
+    def put(self, promotion_id):
         """
         Update a Promotion
 
@@ -165,7 +166,7 @@ class PromotionResource(Resource):
     #------------------------------------------------------------------
     @api.doc('delete_pets')
     @api.response(204, 'Pet deleted')
-    def delete_promotions(self, promotion_id):
+    def delete(self, promotion_id):
         """
         Delete a promotion
         This endpoint will delete a promotion based the id specified in the path
@@ -196,12 +197,8 @@ class PromotionCollection(Resource):
         app.logger.info("Request for promotion list")
         promotions = []
         args = pro_args.parse_args()
-        if len(args.keys()) > 0:
-            app.logger.info('Filtering list')
-            promotions = Promotion.find_by_multi_attributes(args)
-        else:
-            app.logger.info('Returning unfiltered list.')
-            promotions = Promotion.all()
+        app.logger.info('Filtering list')
+        promotions = Promotion.find_by_multi_attributes(args)
 
         results = [promotion.serialize() for promotion in promotions]
         app.logger.info("Returning %d promotions", len(results))
@@ -224,12 +221,11 @@ class PromotionCollection(Resource):
         app.logger.info("Request to create a promotion")
         promotion = Promotion()
         logging.debug('Payload = %s', api.payload)
-        logging.debug(promotion.deserialize(api.payload))
+        promotion.deserialize(api.payload)
         promotion.create()
-        logging.debug(promotion.serialize())
-        location_url = url_for(PromotionResource, promotion_id=promotion.id, _external=True)
+        location_url = api.url_for(PromotionResource, promotion_id=promotion.id, _external=True)
 
-        app.logger.info("Promotion with ID [%s] created.", promotion.id)
+        logging.info("Promotion with ID [%s] created.", promotion.id)
         return promotion.serialize(), status.HTTP_201_CREATED, {'Location': location_url}
 
 ######################################################################
@@ -241,7 +237,7 @@ class ExpireResource(Resource):
     """Expire actions on a promotion"""
     @api.doc('expire_promotions')
     @api.response(404, 'Pet not found')
-    def expire_promotions(self, promotion_id):
+    def put(self, promotion_id):
         """
         Set a Promotion to expired
 
@@ -268,8 +264,8 @@ class ExpireResource(Resource):
 class BestResource(Resource):
     """Get Best Promotion actions on a product"""
     @api.doc('find_best_promotions')
-    @api.response(404, 'Pet not found')
-    def get_best_promotion(self, product_id):
+    @api.response(404, 'Promotion not found')
+    def get(self, product_id):
         """
         Get the best promotion for a product
         This endpoint will get the best promotion based the product's id specified in the path

@@ -89,7 +89,7 @@ class TestYourResourceServer(TestCase):
         # get the id of a promotio
         test_promotion = self._create_promotions(1)[0]
         resp = self.app.get(
-            "/promotions/{}".format(test_promotion.id), content_type=CONTENT_TYPE_JSON
+            BASE_URL + "/{}".format(test_promotion.id), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
@@ -165,7 +165,7 @@ class TestYourResourceServer(TestCase):
             self.assertEqual(
                 resp.status_code, status.HTTP_201_CREATED, "Could not create test promotion"
             )
-        resp = self.app.get("/promotions/11111/best", content_type=CONTENT_TYPE_JSON)
+        resp = self.app.get(BASE_URL + "/11111/best", content_type=CONTENT_TYPE_JSON)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         app.logger.info(data)
@@ -176,6 +176,10 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(data["description"], "Gread Deal")
         self.assertEqual(data["from_date"], (current_date - timedelta(days=1)).isoformat())
         self.assertEqual(data["to_date"], (current_date + timedelta(days=5)).isoformat())
+
+        # Not found
+        resp = self.app.get(BASE_URL + "/11112/best", content_type=CONTENT_TYPE_JSON)
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     ######################################################################
     # Test quey promotion list
@@ -310,7 +314,6 @@ class TestYourResourceServer(TestCase):
     def test_create_promotion(self):
         """Create a new Promotion"""
         test_promotion = PromotionFactory()
-        logging.debug(test_promotion)
         resp = self.app.post(
             BASE_URL, json=test_promotion.serialize(), content_type=CONTENT_TYPE_JSON
         )
@@ -348,9 +351,13 @@ class TestYourResourceServer(TestCase):
         test_promotion.to_date = datetime.now() + timedelta(days=1) 
         self.assertEqual(test_promotion.is_available(), True)
         logging.debug(test_promotion.from_date)
-
         resp = self.app.put(
-            "/promotions/{}/expire".format(test_promotion.id),
+            BASE_URL + "/{}/expire".format(test_promotion.id + 1),
+            content_type=CONTENT_TYPE_JSON,
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        resp = self.app.put(
+            BASE_URL + "/{}/expire".format(test_promotion.id),
             content_type=CONTENT_TYPE_JSON,
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -375,7 +382,7 @@ class TestYourResourceServer(TestCase):
         logging.debug(new_promotion)
         new_promotion["category"] = "Unknown"
         resp = self.app.put(
-            "/promotions/{}".format(new_promotion["id"]),
+            BASE_URL + "/{}".format(new_promotion["id"]),
             json=new_promotion,
             content_type=CONTENT_TYPE_JSON,
         )

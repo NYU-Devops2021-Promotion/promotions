@@ -83,12 +83,12 @@ promotion_model = api.inherit(
 
 # query string arguments
 pro_args = reqparse.RequestParser()
-pro_args.add_argument('product_name', type=str, required=False, help='List Promotions by product name')
-pro_args.add_argument('product_id', type=int, required=False, help='List Promotions by product id')
-pro_args.add_argument('category', type=str, required=False, help='List Promotions by category')
-pro_args.add_argument('from_date', type=str, required=False, help='List Promotions by start date')
-pro_args.add_argument('to_date', type=str, required=False, help='List Promotions by end date')
-pro_args.add_argument('available', type=int, required=False, help='List Promotions by availability, (e.g. 1=available, 0=not_available')
+pro_args.add_argument('product_name', type=str, location='args', required=False, help='List Promotions by product name')
+pro_args.add_argument('product_id', type=int, location='args', required=False, help='List Promotions by product id')
+pro_args.add_argument('category', type=str, location='args', required=False, help='List Promotions by category')
+pro_args.add_argument('from_date', type=str, location='args', required=False, help='List Promotions by start date')
+pro_args.add_argument('to_date', type=str, location='args', required=False, help='List Promotions by end date')
+pro_args.add_argument('available', type=int, location='args', required=False, help='List Promotions by availability, (e.g. 1=available, 0=not_available')
 
 ######################################################################
 # Special Error Handlers

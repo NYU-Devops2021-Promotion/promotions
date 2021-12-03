@@ -65,9 +65,9 @@ create_model = api.model('Promotion', {
                               description='The value of the Promotion (e.g., 25 percent off, buy 1 get one free, etc.)'),
     "description": fields.String(required=False,
                               description='The description of the promotion'),
-    "from_date": fields.String(required=True,
+    "from_date": fields.DateTime(required=True,
                                 description='The start date of the promotion (e.g., 2021-11-28)'),
-    "to_date": fields.String(required=True,
+    "to_date": fields.DateTime(required=True,
                                 description='The end date of the promotion (e.g., 2021-12-28)')
 })
 
@@ -144,7 +144,7 @@ class PromotionResource(Resource):
     @api.doc('update_promotions')
     @api.response(404, 'Promotion not found')
     @api.response(400, 'The posted Promotion data was not valid')
-    @api.expect(promotion_model)
+    @api.expect(create_model)
     @api.marshal_with(promotion_model)
     def put(self, promotion_id):
         """
@@ -154,6 +154,8 @@ class PromotionResource(Resource):
         """
         app.logger.info("Request to update promotion with id: %s", promotion_id)
         promotion = Promotion.find(promotion_id)
+        if not promotion:
+            abort(status.HTTP_404_NOT_FOUND, "Promotion with id '{}' was not found.".format(promotion_id))
         promotion.deserialize(api.payload)
         promotion.id = promotion_id
         promotion.update()

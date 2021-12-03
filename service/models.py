@@ -105,12 +105,18 @@ class Promotion(db.Model):
 
             # convert str to datetime
             if data["from_date"] and isinstance(data["from_date"], str):
-                self.from_date = datetime.fromisoformat(data["from_date"])
+                try:
+                    self.from_date = datetime.fromisoformat(data["from_date"])
+                except ValueError:
+                    raise DataValidationError("Must be ISO format, e.g. 2021-01-01")
             else:
                 self.from_date = data["from_date"]
 
             if data["to_date"] and isinstance(data["to_date"], str):
-                self.to_date = datetime.fromisoformat(data["to_date"])
+                try:
+                    self.to_date = datetime.fromisoformat(data["to_date"])
+                except ValueError:
+                    raise DataValidationError("Must be ISO format, e.g. 2021-01-01") 
             else:
                 self.to_date = data["to_date"]
             #self.from_date = data["from_date"]

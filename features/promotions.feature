@@ -137,3 +137,11 @@ Scenario: Query the best promotion
     And I should see "2021-10-07" in the results
     And I should see "2022-10-07" in the results
 
+Scenario: Delete a promotion
+    When I visit the "Home Page"
+    When I press the "Search" button
+    Then I should see "Macbook" in the results
+    When I press the "Delete" button
+    Then I should see the message "promotion has been Deleted!"
+    When I press the "Search" button
+    Then I should not see "Macbook" in the results

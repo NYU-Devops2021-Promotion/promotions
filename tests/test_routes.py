@@ -25,7 +25,7 @@ DATABASE_URI = os.getenv(
 if 'VCAP_SERVICES' in os.environ:
     vcap = json.loads(os.environ['VCAP_SERVICES'])
     DATABASE_URI = vcap['user-provided'][0]['credentials']['url']
-BASE_URL = "/promotions"
+BASE_API = "/api/promotions"
 CONTENT_TYPE_JSON = "application/json"
 ######################################################################
 #  T E S T   C A S E S
@@ -69,7 +69,7 @@ class TestYourResourceServer(TestCase):
         for _ in range(count):
             test_promotion = PromotionFactory()
             resp = self.app.post(
-                BASE_URL, json=test_promotion.serialize(), content_type=CONTENT_TYPE_JSON
+                BASE_API, json=test_promotion.serialize(), content_type=CONTENT_TYPE_JSON
             )
             self.assertEqual(
                 resp.status_code, status.HTTP_201_CREATED, "Could not create test promotion"
@@ -89,7 +89,7 @@ class TestYourResourceServer(TestCase):
         # get the id of a promotio
         test_promotion = self._create_promotions(1)[0]
         resp = self.app.get(
-            BASE_URL + "/{}".format(test_promotion.id), content_type=CONTENT_TYPE_JSON
+            BASE_API + "/{}".format(test_promotion.id), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
@@ -103,7 +103,7 @@ class TestYourResourceServer(TestCase):
     def test_get_promotion_list(self):
         """Get a list of promotions"""
         self._create_promotions(5)
-        resp = self.app.get(BASE_URL)
+        resp = self.app.get(BASE_API)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(len(data), 5)
@@ -115,7 +115,7 @@ class TestYourResourceServer(TestCase):
 
     def test_create_promotion_no_content_type(self):
          """Create a promotion with no content type"""
-         resp = self.app.post(BASE_URL)
+         resp = self.app.post(BASE_API)
          self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_get_best_promotion(self):
@@ -160,12 +160,12 @@ class TestYourResourceServer(TestCase):
         ))
         for promotion in promotions:
             resp = self.app.post(
-                BASE_URL, json=promotion.serialize(), content_type=CONTENT_TYPE_JSON
+                BASE_API, json=promotion.serialize(), content_type=CONTENT_TYPE_JSON
             )
             self.assertEqual(
                 resp.status_code, status.HTTP_201_CREATED, "Could not create test promotion"
             )
-        resp = self.app.get(BASE_URL + "/11111/best", content_type=CONTENT_TYPE_JSON)
+        resp = self.app.get(BASE_API + "/11111/best", content_type=CONTENT_TYPE_JSON)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         app.logger.info(data)
@@ -178,7 +178,7 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(data["to_date"], (current_date + timedelta(days=5)).isoformat())
 
         # Not found
-        resp = self.app.get(BASE_URL + "/11112/best", content_type=CONTENT_TYPE_JSON)
+        resp = self.app.get(BASE_API + "/11112/best", content_type=CONTENT_TYPE_JSON)
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     ######################################################################
@@ -193,7 +193,7 @@ class TestYourResourceServer(TestCase):
         category_promotions = [promotion for promotion in promotions if promotion.category == test_category]
         logging.debug(promotions[0])
         resp = self.app.get(
-            BASE_URL, query_string="category={}".format((test_category))
+            BASE_API, query_string="category={}".format((test_category))
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
@@ -210,7 +210,7 @@ class TestYourResourceServer(TestCase):
         name_promotions = [promotion for promotion in promotions if promotion.product_name == test_name]
         logging.debug(promotions[0])
         resp = self.app.get(
-            BASE_URL, query_string="product_name={}".format((test_name))
+            BASE_API, query_string="product_name={}".format((test_name))
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
@@ -227,7 +227,7 @@ class TestYourResourceServer(TestCase):
         product_id_promotions = [promotion for promotion in promotions if promotion.product_id == test_product_id]
         logging.debug(promotions[0])
         resp = self.app.get(
-            BASE_URL, query_string="product_id={}".format((test_product_id))
+            BASE_API, query_string="product_id={}".format((test_product_id))
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
@@ -244,7 +244,7 @@ class TestYourResourceServer(TestCase):
         from_date_promotions = [promotion for promotion in promotions if promotion.from_date == test_from_date]
         logging.debug(promotions[0])
         resp = self.app.get(
-            BASE_URL, query_string="from_date={}".format((test_from_date))
+            BASE_API, query_string="from_date={}".format((test_from_date))
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
@@ -260,7 +260,7 @@ class TestYourResourceServer(TestCase):
         to_date_promotions = [promotion for promotion in promotions if promotion.to_date == test_to_date]
         logging.debug(promotions[0])
         resp = self.app.get(
-            BASE_URL, query_string="to_date={}".format((test_to_date))
+            BASE_API, query_string="to_date={}".format((test_to_date))
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
@@ -276,7 +276,7 @@ class TestYourResourceServer(TestCase):
         availability_promotions = [promotion for promotion in promotions if promotion.is_available()]
         logging.debug(promotions[0])
         resp = self.app.get(
-            BASE_URL, query_string="available={}".format(availability)
+            BASE_API, query_string="available={}".format(availability)
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
@@ -286,7 +286,7 @@ class TestYourResourceServer(TestCase):
         availability_promotions = [promotion for promotion in promotions if not promotion.is_available()]
         logging.debug(promotions[0])
         resp = self.app.get(
-            BASE_URL, query_string="available={}".format(availability)
+            BASE_API, query_string="available={}".format(availability)
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
@@ -299,7 +299,7 @@ class TestYourResourceServer(TestCase):
             logging.debug(promotion)
             availability = 1 if promotion.is_available() else 0
             resp = self.app.get(
-                BASE_URL, query_string="category={}&product_name={}&product_id={}&from_date={}&to_date={}&available={}".format(
+                BASE_API, query_string="category={}&product_name={}&product_id={}&from_date={}&to_date={}&available={}".format(
                     promotion.category, promotion.product_name, promotion.product_id, promotion.from_date, promotion.to_date, availability)
             )
             self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -315,7 +315,7 @@ class TestYourResourceServer(TestCase):
         """Create a new Promotion"""
         test_promotion = PromotionFactory()
         resp = self.app.post(
-            BASE_URL, json=test_promotion.serialize(), content_type=CONTENT_TYPE_JSON
+            BASE_API, json=test_promotion.serialize(), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         # Make sure location header is set
@@ -352,12 +352,12 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(test_promotion.is_available(), True)
         logging.debug(test_promotion.from_date)
         resp = self.app.put(
-            BASE_URL + "/{}/expire".format(test_promotion.id + 1),
+            BASE_API + "/{}/expire".format(test_promotion.id + 1),
             content_type=CONTENT_TYPE_JSON,
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
         resp = self.app.put(
-            BASE_URL + "/{}/expire".format(test_promotion.id),
+            BASE_API + "/{}/expire".format(test_promotion.id),
             content_type=CONTENT_TYPE_JSON,
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -373,7 +373,7 @@ class TestYourResourceServer(TestCase):
         # create a promotion to update
         test_promotion = PromotionFactory()
         resp = self.app.post(
-            BASE_URL, json=test_promotion.serialize(), content_type=CONTENT_TYPE_JSON
+            BASE_API, json=test_promotion.serialize(), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
@@ -382,7 +382,7 @@ class TestYourResourceServer(TestCase):
         logging.debug(new_promotion)
         new_promotion["category"] = "Unknown"
         resp = self.app.put(
-            BASE_URL + "/{}".format(new_promotion["id"]),
+            BASE_API + "/{}".format(new_promotion["id"]),
             json=new_promotion,
             content_type=CONTENT_TYPE_JSON,
         )
@@ -394,12 +394,12 @@ class TestYourResourceServer(TestCase):
         """Delete a Promotion"""
         test_promotion = self._create_promotions(1)[0]
         resp = self.app.delete(
-            "{0}/{1}".format(BASE_URL, test_promotion.id), content_type=CONTENT_TYPE_JSON
+            "{0}/{1}".format(BASE_API, test_promotion.id), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(resp.data), 0)
         # make sure they are deleted
         resp = self.app.get(
-            "{0}/{1}".format(BASE_URL, test_promotion.id), content_type=CONTENT_TYPE_JSON
+            "{0}/{1}".format(BASE_API, test_promotion.id), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)

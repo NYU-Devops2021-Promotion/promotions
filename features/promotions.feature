@@ -120,9 +120,6 @@ Scenario: Promotion Action Test
     Then I should see the message "Success"
     When I press the "Search" button
     Then I should see the message "Success"
-    And I should not see "Macbook" in the results
-    And I should not see "Discount" in the results
-    And I should not see "11111" in the results
     And I should not see "2021-10-06" in the results
 
 Scenario: Query the best promotion
@@ -144,4 +141,5 @@ Scenario: Delete a promotion
     When I press the "Delete" button
     Then I should see the message "promotion has been Deleted!"
     When I press the "Search" button
-    Then I should not see "Macbook" in the results
+    Then I should see the message "Success"
+    And I should not see "Macbook" in the results

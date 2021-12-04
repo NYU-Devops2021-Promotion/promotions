@@ -20,7 +20,7 @@ applications:
 - name: nyu-promotion-service-fall2101-prod
   path: .
   instances: 1
-  memory: 128
+  memory: 128M
   routes:
   - route: nyu-promotion-service-fall2101-prod.us-south.cf.appdomain.cloud
   disk_quota: 1024M

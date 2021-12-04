@@ -6,7 +6,7 @@ applications:
   instances: 2
   memory: 256M
   routes:
-  - route: nyu-promotion-service-fall2101.us-south.cf.appdomain.cloud
+  - route: nyu-promotion-service-fall2101-dev.us-south.cf.appdomain.cloud
   disk_quota: 1024M
   buildpacks: 
   - python_buildpack
@@ -16,3 +16,20 @@ applications:
   env:
     FLASK_APP : service:app
     FLASK_DEBUG : false
+
+- name: nyu-promotion-service-fall2101
+  path: .
+  instances: 2
+  memory: 256M
+  routes:
+  - route: nyu-promotion-service-fall2101-prod.us-south.cf.appdomain.cloud
+  disk_quota: 1024M
+  buildpacks: 
+  - python_buildpack
+  timeout: 180
+  services:
+  - ElephantSQL
+  env:
+    FLASK_APP : service:app
+    FLASK_DEBUG : false
+

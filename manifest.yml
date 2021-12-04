@@ -12,7 +12,7 @@ applications:
   - python_buildpack
   timeout: 180
   services:
-  - ElephantSQL
+  - ElephantSQL-dev
   env:
     FLASK_APP : service:app
     FLASK_DEBUG : false
@@ -28,7 +28,7 @@ applications:
   - python_buildpack
   timeout: 180
   services:
-  - ElephantSQL
+  - ElephantSQL-prod
   env:
     FLASK_APP : service:app
     FLASK_DEBUG : false

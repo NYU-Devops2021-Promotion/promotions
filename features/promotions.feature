@@ -90,18 +90,19 @@ Scenario: Read all promotions
 
 Scenario: Update a promotion
     When I visit the "Home Page"
-    And I select "Discount" in the "category" dropdown
+    And I set the "product_id" to "11111"
     And I press the "Search" button
     Then I should see the message "Success"
-    And I should see "Discount" in the "category" dropdown
-    When I select "BOGOF" in the "category" dropdown
+    And I should see "11111" in the "product_id" field
+    When I set the "product_id" to "11112"
     And I press the "Update" button
     Then I should see the message "Success"
     When I copy the "id" field
     And I press the "Clear" button
     When I paste the "id" field
-    And I press the "Retrieve" button
-    Then I should see "BOGOF" in the "category" dropdown
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "11112" in the "product_id" field
 
 Scenario: Promotion Action Test
     When I visit the "Home Page"
@@ -120,9 +121,6 @@ Scenario: Promotion Action Test
     Then I should see the message "Success"
     When I press the "Search" button
     Then I should see the message "Success"
-    And I should not see "Macbook" in the results
-    And I should not see "Discount" in the results
-    And I should not see "11111" in the results
     And I should not see "2021-10-06" in the results
 
 Scenario: Query the best promotion
@@ -144,4 +142,5 @@ Scenario: Delete a promotion
     When I press the "Delete" button
     Then I should see the message "promotion has been Deleted!"
     When I press the "Search" button
-    Then I should not see "Macbook" in the results
+    Then I should see the message "Success"
+    And I should not see "Macbook" in the results

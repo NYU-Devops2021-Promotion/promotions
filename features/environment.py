@@ -6,7 +6,7 @@ from selenium import webdriver
 
 
 WAIT_SECONDS = int(getenv('WAIT_SECONDS', '60'))
-BASE_URL = getenv('BASE_URL', 'http://localhost:5000')
+BASE_URL = getenv('BASE_URL', 'https://nyu-promotion-service-fall2101-dev.us-south.cf.appdomain.cloud')
 
 def before_all(context):
     """ Executed once before all tests """

@@ -5,8 +5,9 @@
 # Promotions
 NYU Devops2021 Promotions
 
-## Prod Link
-https://nyu-promotion-service-fall2101-prod.us-south.cf.appdomain.cloud/
+##  IBM Cloud URL
+Dev: https://nyu-promotion-service-fall2101.us-south.cf.appdomain.cloud/
+Prod: https://nyu-promotion-service-fall2101-prod.us-south.cf.appdomain.cloud/
 
 ## Download & Build
 ### Vagrant

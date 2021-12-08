@@ -5,6 +5,9 @@
 # Promotions
 NYU Devops2021 Promotions
 
+## Prod Link
+https://nyu-promotion-service-fall2101-prod.us-south.cf.appdomain.cloud/
+
 ## Download & Build
 ### Vagrant
 ```shell
